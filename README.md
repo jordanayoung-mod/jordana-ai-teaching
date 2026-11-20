@@ -199,7 +199,16 @@ The site is usable before these are done. Buttons that need a missing link say t
 
 Pushes to `main` run `.github/workflows/pages.yml`. That workflow uploads the site and deploys it with GitHub Actions.
 
-In the repository settings, **Settings > Pages > Build and deployment > Source** must be **GitHub Actions**. If this account could not switch that on, that is the setting to change. After it is set, re-run the "Deploy to GitHub Pages" workflow from the Actions tab.
+Pages is not on yet. The workflow tried to turn it on (`actions/configure-pages` with `enablement: true`, and a direct API call). Both were refused with "Resource not accessible by integration", so this token cannot change Pages settings.
+
+Turn it on yourself:
+
+1. Open the repository on GitHub.
+2. Go to **Settings > Pages**.
+3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+4. Open the **Actions** tab, select **Deploy to GitHub Pages**, and re-run the latest workflow.
+
+After that run is green, the site is at https://jordanayoung-mod.github.io/jordana-ai-teaching/
 
 ## Check the price maths locally
 
