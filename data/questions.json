@@ -1,0 +1,207 @@
+{
+  "_comment": "Edit questions, points, and the score bands here. Push to main. Scoring: each scored question is worth 0 to 3. Maximum is 30. Bands: 0-7 Beginner, 8-15 Intermediate, 16-23 Advanced, 24-30 Expert. Adjustments: if Q1 is never, the level is capped at Beginner. If the path is agents and the score is 12 or more, the level moves up one band, unless the Beginner cap applied. The price does not depend on the level.",
+  "maxScore": 30,
+  "bands": [
+    {
+      "id": "beginner",
+      "label": "Beginner",
+      "min": 0,
+      "max": 7,
+      "summary": "You are at the start, so the session stays practical and unhurried. We get an account working, try a few prompts on a real everyday task, and practise telling a useful answer from a shaky one. You should leave with one or two prompts you can reuse this week."
+    },
+    {
+      "id": "intermediate",
+      "label": "Intermediate",
+      "min": 8,
+      "max": 15,
+      "summary": "You already use a chat tool, so we spend the time on clearer prompts and a repeatable way to do a real task. Bring work you are allowed to share. You should leave with a template you can run again without me."
+    },
+    {
+      "id": "advanced",
+      "label": "Advanced",
+      "min": 16,
+      "max": 23,
+      "summary": "You use AI often, so we build something that can stay in your workflow: a custom assistant, a task that uses a file, or a simple automation. Come with one process you want to improve. You should leave with that workflow started in your own account."
+    },
+    {
+      "id": "expert",
+      "label": "Expert",
+      "min": 24,
+      "max": 30,
+      "summary": "You are ready to connect tools and build an agent or a multi-step automation. We scope one workflow and build as far as the session allows. You should leave with a working piece of that system, plus the next steps to finish it."
+    }
+  ],
+  "adjustments": {
+    "capAtBeginnerIf": { "question": "q1", "value": "never" },
+    "bumpUpIf": { "question": "q12", "value": "agents", "minScore": 12 }
+  },
+  "paths": {
+    "work": {
+      "label": "Work productivity",
+      "summary": "We will use a real work task, such as email, meeting notes, or a status update, and turn it into a prompt you can run again."
+    },
+    "writing": {
+      "label": "Writing",
+      "summary": "We will work on drafts, rewrites, or a voice you want the tool to keep, using text you are allowed to share."
+    },
+    "research": {
+      "label": "Research",
+      "summary": "We will practise asking a sharper question, checking the answer, and keeping a source trail."
+    },
+    "images": {
+      "label": "Images",
+      "summary": "We will make images you can actually use, and write prompts you can change for the next one."
+    },
+    "agents": {
+      "label": "Agents and automation",
+      "summary": "We will map one repeated process and build the first working step of an assistant or an automation."
+    },
+    "home": {
+      "label": "AI at home",
+      "summary": "We will pick a home task, such as planning, learning, or organising information, and build a prompt you will use again."
+    }
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "type": "single",
+      "prompt": "How often do you use AI tools such as ChatGPT, Claude, Gemini, or Microsoft Copilot?",
+      "options": [
+        { "value": "never", "label": "Never", "points": 0 },
+        { "value": "once", "label": "I have tried once or twice", "points": 1 },
+        { "value": "weekly", "label": "Weekly", "points": 2 },
+        { "value": "daily", "label": "Daily", "points": 3 }
+      ]
+    },
+    {
+      "id": "q2",
+      "type": "multi",
+      "prompt": "Which kinds of AI tools have you used? Select all that apply.",
+      "hint": "Choose None if you have not used any. None clears the other boxes.",
+      "exclusiveValue": "none",
+      "scoreByCount": [
+        { "min": 0, "max": 0, "points": 0 },
+        { "min": 1, "max": 1, "points": 1 },
+        { "min": 2, "max": 3, "points": 2 },
+        { "min": 4, "max": 99, "points": 3 }
+      ],
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "chat", "label": "A chat tool (ChatGPT, Claude, Gemini, or Copilot)" },
+        { "value": "image", "label": "An image tool" },
+        { "value": "meeting", "label": "A meeting or notes tool" },
+        { "value": "automation", "label": "An automation or agent tool (for example Zapier, Make, a custom GPT, or an agent builder)" }
+      ]
+    },
+    {
+      "id": "q3",
+      "type": "single",
+      "prompt": "What do you mainly use AI for today?",
+      "options": [
+        { "value": "nothing", "label": "Nothing yet", "points": 0 },
+        { "value": "search", "label": "Simple questions or search", "points": 1 },
+        { "value": "writing", "label": "Writing, summarising, or analysing", "points": 2 },
+        { "value": "workflows", "label": "It is built into my regular work", "points": 3 }
+      ]
+    },
+    {
+      "id": "q4",
+      "type": "single",
+      "prompt": "Which best describes how you write a prompt?",
+      "options": [
+        { "value": "unsure", "label": "I am not sure what a prompt is", "points": 0 },
+        { "value": "question", "label": "I type a question", "points": 1 },
+        { "value": "context", "label": "I give context, a role, and a format", "points": 2 },
+        { "value": "templates", "label": "I reuse and refine templates or multi-step prompts", "points": 3 }
+      ]
+    },
+    {
+      "id": "q5",
+      "type": "single",
+      "prompt": "Have you given an AI tool a file, such as a PDF, a spreadsheet, or an image, to work with?",
+      "options": [
+        { "value": "no", "label": "No", "points": 0 },
+        { "value": "once", "label": "Once", "points": 1 },
+        { "value": "sometimes", "label": "Sometimes", "points": 2 },
+        { "value": "regularly", "label": "Regularly, including data analysis", "points": 3 }
+      ]
+    },
+    {
+      "id": "q6",
+      "type": "single",
+      "prompt": "Have you created a custom assistant, such as a custom GPT, a Claude Project, a Gemini Gem, or a Copilot agent?",
+      "options": [
+        { "value": "no", "label": "No, or I am not sure what that is", "points": 0 },
+        { "value": "heard", "label": "I have heard of it", "points": 1 },
+        { "value": "tried", "label": "I have tried once", "points": 2 },
+        { "value": "several", "label": "I use or share several", "points": 3 }
+      ]
+    },
+    {
+      "id": "q7",
+      "type": "single",
+      "prompt": "Have you connected AI to other tools, or automated a task, for example with Zapier, Make, or an agent builder?",
+      "options": [
+        { "value": "no", "label": "No", "points": 0 },
+        { "value": "curious", "label": "I am curious, but I have not done it", "points": 1 },
+        { "value": "one", "label": "I have one simple automation", "points": 2 },
+        { "value": "several", "label": "I have several in regular use", "points": 3 }
+      ]
+    },
+    {
+      "id": "q8",
+      "type": "single",
+      "prompt": "How confident are you judging whether an AI answer is accurate?",
+      "options": [
+        { "value": "none", "label": "Not at all", "points": 0 },
+        { "value": "little", "label": "A little", "points": 1 },
+        { "value": "fairly", "label": "Fairly. I check sources", "points": 2 },
+        { "value": "very", "label": "Very. I know the common ways these tools fail", "points": 3 }
+      ]
+    },
+    {
+      "id": "q9",
+      "type": "single",
+      "prompt": "How familiar are you with what is safe to share with AI tools?",
+      "options": [
+        { "value": "none", "label": "Not at all", "points": 0 },
+        { "value": "somewhat", "label": "Somewhat", "points": 1 },
+        { "value": "good", "label": "Good. I follow the rules at work", "points": 2 },
+        { "value": "very", "label": "Very. I could explain it to someone else", "points": 3 }
+      ]
+    },
+    {
+      "id": "q10",
+      "type": "single",
+      "prompt": "How comfortable are you learning new software in general?",
+      "options": [
+        { "value": "hard", "label": "I find it hard", "points": 0 },
+        { "value": "help", "label": "I am OK with help", "points": 1 },
+        { "value": "comfortable", "label": "Comfortable", "points": 2 },
+        { "value": "explore", "label": "Very. I explore on my own", "points": 3 }
+      ]
+    },
+    {
+      "id": "q11",
+      "type": "text",
+      "scored": false,
+      "prompt": "What is the main thing you want AI to help you with, in your life or your work?",
+      "hint": "A sentence or two is enough. I read this before the session."
+    },
+    {
+      "id": "q12",
+      "type": "single",
+      "scored": false,
+      "setsPath": true,
+      "prompt": "Which area do you want to work on most?",
+      "options": [
+        { "value": "work", "label": "Work productivity", "points": 0 },
+        { "value": "writing", "label": "Writing", "points": 0 },
+        { "value": "research", "label": "Research", "points": 0 },
+        { "value": "images", "label": "Images", "points": 0 },
+        { "value": "agents", "label": "Agents and automation", "points": 0 },
+        { "value": "home", "label": "AI at home", "points": 0 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-root=".">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Book and pay · Jordana Young</title>
+  <meta name="description" content="Pay the current session price, then choose a time. Sunday to Thursday, Israel time, from 29 November 2026.">
+  <link rel="canonical" href="https://jordanayoung-mod.github.io/jordana-ai-teaching/book.html">
+  <meta name="theme-color" content="#1e463a">
+  <meta property="og:title" content="Book and pay · Jordana Young">
+  <meta property="og:description" content="Pay the current session price, then choose a time. Sunday to Thursday, Israel time, from 29 November 2026.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jordanayoung-mod.github.io/jordana-ai-teaching/book.html">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true">JY</span><span>Jordana Young</span></a>
+      <a class="header-find" href="assess.html">Find your level</a>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="nav-panel">Menu</button>
+      <nav class="nav-panel" id="nav-panel" aria-label="Primary">
+        <ul class="nav-list"><li><a href="sessions.html">Sessions</a></li><li><a href="how-it-works.html">How it works</a></li><li><a href="about.html">About</a></li><li><a href="companies.html">For companies</a></li><li><a href="faq.html">FAQ</a></li></ul>
+        <div class="nav-ctas">
+          <a class="button button-line" href="quote.html">Get a quote for a custom build</a>
+          <a class="button button-solid" href="assess.html">Find your level</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <noscript>
+    <div class="wrap" style="padding-top:1rem">
+      <p class="note" style="padding:0.8rem 1rem">JavaScript is off, so the live price and the questionnaire will not run. You can still read every page. Use the contact page and I will tell you the current price.</p>
+    </div>
+  </noscript>
+  <main id="main">
+
+  <section class="section">
+    <div class="wrap-narrow">
+      <p class="kicker">Book</p>
+      <h1>Book and pay</h1>
+      <p class="lede">Pay first, on the payment provider's page. Then choose a time. I do not store your card number.</p>
+      <div data-when="soldout" hidden>
+        <p>All 40 sessions in this release are sold, so booking is closed until the next release.</p>
+        <p><a class="button button-solid" href="waitlist.html">Join the waitlist</a></p>
+      </div>
+      <div data-when="available">
+        <div id="book-gate">
+          <p>If you have not done the questionnaire in this browser, add your details here so the booking link can carry your name and level.</p>
+          <form id="book-gate-form" class="form-card" novalidate>
+            <div class="form-alert" data-alert tabindex="-1" hidden></div>
+            <div class="field"><label for="firstName">First name (required)</label><input id="firstName" name="firstName" autocomplete="given-name" required><span class="field-error" data-error-for="firstName"></span></div>
+            <div class="field"><label for="lastName">Last name (required)</label><input id="lastName" name="lastName" autocomplete="family-name" required><span class="field-error" data-error-for="lastName"></span></div>
+            <div class="field"><label for="email">Email (required)</label><input id="email" name="email" type="email" autocomplete="email" required><span class="field-error" data-error-for="email"></span></div>
+            <div class="field"><label for="phone">Mobile phone</label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="level">Level (required)</label>
+              <select id="level" name="level" required>
+                <option value="">Choose one</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="expert">Expert</option>
+              </select>
+              <span class="field-error" data-error-for="level"></span>
+            </div>
+            <button class="button button-solid" type="submit">Continue to payment</button>
+          </form>
+        </div>
+        <div id="book-flow">
+          <p id="book-who"></p>
+          <p class="price-left" data-price-left>Loading how many are left.</p>
+          <p data-price-next></p>
+          <h2>1. Pay</h2>
+          <p>You pay the current price in ILS. Card and Bit are the intended methods. After a successful payment you should get a confirmation by email, and a receipt or tax invoice once invoicing is connected.</p>
+          <p><a class="button button-solid" id="pay-link" data-label="Pay" href="contact.html">Pay</a></p>
+          <p class="hint" data-link-note hidden>The payment link is not connected yet. Use the contact page and I will send it.</p>
+          <h2>2. Choose a time</h2>
+          <p>Set the payment provider to send people to the booking link after payment. The button below opens that same link, with your name, email, and level added as parameters.</p>
+          <p><a class="button button-line" id="schedule-link" href="contact.html">Choose a time</a></p>
+          <p class="hint" data-link-note hidden>The booking link is not connected yet. Use the contact page and I will send times.</p>
+          <h2>Hours</h2>
+          <p>Bookings open the week of Sunday 29 November 2026. Times on the booking page appear in your time zone. The confirmation also states the Israel time.</p>
+          <div class="table-scroll">
+    <table>
+      <caption>When you can book, in Israel time</caption>
+      <thead>
+        <tr><th scope="col">Day</th><th scope="col">Open</th><th scope="col">Blocked</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Sunday</th><td>11:00 to 20:00</td><td>12:00 to 12:30 lunch</td></tr>
+        <tr><th scope="row">Monday</th><td>11:00 to 20:00</td><td>12:00 to 12:30 lunch, and 16:30 to 18:30</td></tr>
+        <tr><th scope="row">Tuesday</th><td>11:00 to 20:00</td><td>12:00 to 12:30 lunch</td></tr>
+        <tr><th scope="row">Wednesday</th><td>11:00 to 20:00</td><td>12:00 to 12:30 lunch</td></tr>
+        <tr><th scope="row">Thursday</th><td>11:00 to 20:00</td><td>12:00 to 12:30 lunch</td></tr>
+        <tr><th scope="row">Friday</th><td>Closed</td><td>Not bookable</td></tr>
+        <tr><th scope="row">Saturday</th><td>Closed</td><td>Not bookable</td></tr>
+      </tbody>
+    </table>
+  </div>
+          <h2>Google Calendar</h2>
+          <p>The booking tool adds the session to my Google Calendar and blocks times that are already busy. The title should include your name and level, for example AI Session: Dana Cohen (Beginner).</p>
+          <p><a id="book-prep" href="after-booking.html">See what to prepare</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="serif" style="font-size:1.6rem;margin:0 0 0.4rem">Jordana Young</p>
+        <p>One-to-one AI sessions, online, in English.</p>
+        <p><a data-email-link data-keep-label hidden href="">Email me</a></p>
+        <p data-email-missing>The public email address will appear here once it is added.</p>
+        <p><a data-whatsapp-link hidden href="" target="_blank" rel="noopener noreferrer">WhatsApp<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+      </div>
+      <div>
+        <p><strong>On this site</strong></p>
+        <ul class="footer-links">
+          <li><a href="sessions.html">Sessions and pricing</a></li>
+          <li><a href="how-it-works.html">How it works</a></li>
+          <li><a href="after-booking.html">After you book</a></li>
+          <li><a href="companies.html">Workflow builds for companies</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p><strong>Policies</strong></p>
+        <ul class="footer-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms</a></li>
+          <li><a href="accessibility.html">Accessibility statement</a></li>
+          <li><a href="review.html">Leave a review</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="wrap disclaimer">
+      <p>This is my personal business website. It is not affiliated with, sponsored or endorsed by Microsoft. Microsoft and Copilot Studio are trademarks of the Microsoft group of companies.</p>
+      <p>© <span data-year>2026</span> Jordana Young</p>
+    </div>
+  </footer>
+  <div id="cookie-banner" class="cookie" hidden role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-text">
+    <p id="cookie-text"><strong id="cookie-title">Analytics cookies.</strong> I use an analytics tool only after you accept. If you reject it, the site still works and no analytics script loads.</p>
+    <button type="button" class="button button-solid" id="cookie-accept">Accept analytics</button>
+    <button type="button" class="button button-line" id="cookie-reject">Reject</button>
+    <a href="privacy.html">Read the Privacy Policy</a>
+  </div>
+  <script src="config.js"></script>
+  <script src="js/logic.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/forms.js"></script>
+  <script src="js/book.js"></script>
+</body>
+</html>

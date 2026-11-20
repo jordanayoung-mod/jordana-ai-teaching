@@ -1,0 +1,31 @@
+{
+  "_comment": "Only objects with \"approved\": true AND \"sample\" not true are shown on the site. To publish a real review, add an object (or edit one that arrived from your form tool), set approved to true, and push to main. Do not change the reviewer's words. Samples below are format examples and must stay approved false. LetsGo does not get reviews automatically: if shareWithLetsGo is true and you approve the review, send it to LetsGo by their email or form until they offer an API. See the README.",
+  "reviews": [
+    {
+      "id": "sample-1",
+      "sample": true,
+      "approved": false,
+      "displayName": "Sample Student",
+      "rating": 5,
+      "text": "This is a sample review used to show the file format. It is not a real testimonial and it must not be published.",
+      "sessionType": "Beginner",
+      "date": "2026-11-20",
+      "consentToPublish": false,
+      "shareWithLetsGo": false,
+      "letsgoSync": "not-sent"
+    },
+    {
+      "id": "sample-2",
+      "sample": true,
+      "approved": false,
+      "displayName": "Another Sample",
+      "rating": 4,
+      "text": "Second sample, also unpublished. Replace these by adding real reviews with sample set to false.",
+      "sessionType": "Intermediate",
+      "date": "2026-11-20",
+      "consentToPublish": false,
+      "shareWithLetsGo": false,
+      "letsgoSync": "not-sent"
+    }
+  ]
+}
