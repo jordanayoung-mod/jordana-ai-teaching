@@ -26,6 +26,11 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Turns Pages on with source GitHub Actions when this token is allowed to.
+          # The default GITHUB_TOKEN often cannot do this. If the step fails,
+          # set Settings > Pages > Build and deployment > Source to GitHub Actions.
+          enablement: true
 
       - name: Copy site files
         run: |
