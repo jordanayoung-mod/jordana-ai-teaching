@@ -1,326 +1,392 @@
 import * as React from "react"
+import { useState } from "react"
 import { addPropertyControls, ControlType } from "framer"
 
-/**
- * OfferingsAndCohorts: "Ways to work with me" (#ways-to-work) and the
- * December cohorts (#cohorts) with a priority waitlist form that POSTs
- * { event: "waitlist_join", ... } to webhookUrl.
- *
- * Cohort cards: on the live site the cards come from the Cohorts CMS collection
- * (a canvas Collection List filtered to Visible = Yes, placed just above a second
- * instance of this component that has "Cohort header" and "Cards" switched off).
- * Framer code components can't read CMS collections directly, so the built-in
- * COHORTS list below (editable in the "Cohorts (fallback)" control) is the fallback.
- *
- * @framerSupportedLayoutWidth any-prefer-fixed
- * @framerSupportedLayoutHeight auto
- */
-
-interface Cohort {
-    title: string
-    level: string
-    day: string
-    schedule: string
-    price: number
-    seatsRemaining: number
-    status: string
-    visible: boolean
-    promise: string
-    paymentUrl: string
-}
-
-interface Offering {
-    title: string
-    price: string
-    body: string
-    ctaLabel: string
-    ctaUrl: string
-}
-
-interface Props {
-    primaryColor: string
-    accentColor: string
-    creamColor: string
-    showWaysToWork: boolean
-    waysTitle: string
-    offerings: Offering[]
-    cohortsTitle: string
-    cohortsIntro: string
-    cohorts: Cohort[]
-    showCohortsSection: boolean
-    showCohortsHeader: boolean
-    showCards: boolean
-    webhookUrl: string
-    privacyUrl: string
-    style?: React.CSSProperties
-}
-
-export const COHORTS: Cohort[] = [
-    {
-        title: "AI Starter, Sunday Group A",
-        level: "Beginner",
-        day: "Sunday",
-        schedule: "3 weekly Sunday evening sessions on Zoom: 90 min, 90 min, then a 60 min live clinic and wrap-up. Israel time. Starts December 2026, exact dates coming soon.",
-        price: 600,
-        seatsRemaining: 15,
-        status: "Waitlist",
-        visible: true,
-        promise: "Go from \"where do I even start?\" to using AI with confidence for real tasks every week.",
-        paymentUrl: "",
-    },
-    {
-        title: "AI Starter, Sunday Group B",
-        level: "Beginner",
-        day: "Sunday",
-        schedule: "3 weekly Sunday evening sessions on Zoom: 90 min, 90 min, then a 60 min live clinic and wrap-up. Israel time. Starts December 2026, exact dates coming soon.",
-        price: 600,
-        seatsRemaining: 15,
-        status: "Waitlist",
-        visible: true,
-        promise: "Go from \"where do I even start?\" to using AI with confidence for real tasks every week.",
-        paymentUrl: "",
-    },
-    {
-        title: "AI at Work, Wednesday Group",
-        level: "Intermediate",
-        day: "Wednesday",
-        schedule: "4 weekly Wednesday evening sessions on Zoom, 90 min each. Israel time. Starts December 2026, exact dates coming soon.",
-        price: 600,
-        seatsRemaining: 15,
-        status: "Waitlist",
-        visible: true,
-        promise: "Turn hit-and-miss prompting into a personal prompt library and one reliable weekly workflow.",
-        paymentUrl: "",
-    },
-]
-
-const DEFAULT_OFFERINGS: Offering[] = [
-    {
-        title: "Small-group live courses",
-        price: "₪600 per person",
-        body: "Up to 15 people on Zoom, hands-on breakout rooms and a private group chat between sessions. December groups for Beginner and Intermediate.",
-        ctaLabel: "See the cohorts",
-        ctaUrl: "#cohorts",
-    },
-    {
-        title: "Private 1:1 coaching",
-        price: "From ₪400 per session",
-        body: "One focused session on your own tasks and tools. Only 40 sessions this round, and the price steps up every 8 sessions.",
-        ctaLabel: "See 1:1 coaching",
-        ctaUrl: "/#coaching",
-    },
-    {
-        title: "Workflow builds for teams",
-        price: "Priced by quote",
-        body: "I design and build an AI workflow or assistant around how your team already works, set up in your own accounts.",
-        ctaLabel: "Ask for a quote",
-        ctaUrl: "/#workflows",
-    },
-]
-
+// WCAG AA: a darker shade of the accent for text and for backgrounds behind white text.
 function shade(hex: string, factor: number) {
-    const h = hex.replace("#", "")
+    const h = (hex || "").replace("#", "")
     if (h.length !== 6) return hex
     const n = [0, 2, 4].map((i) => Math.round(parseInt(h.slice(i, i + 2), 16) * factor))
     return "#" + n.map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("")
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const COHORTS = [
+    {
+        id: "ai-starter-sun-1",
+        level: "Beginner",
+        day: "Sunday Nights (Group A)",
+        title: "AI Starter (Beginner)",
+        schedule: "3 weekly sessions (Sessions 1 & 2: 90 mins; Session 3: 60 mins live clinic)",
+        status: "Starts December 2026, exact dates coming soon",
+        seats: "15 seats max",
+        promise: "Go from 'where do I even start?' to using AI with confidence for real tasks every week.",
+    },
+    {
+        id: "ai-starter-sun-2",
+        level: "Beginner",
+        day: "Sunday Nights (Group B)",
+        title: "AI Starter (Beginner)",
+        schedule: "3 weekly sessions (Sessions 1 & 2: 90 mins; Session 3: 60 mins live clinic)",
+        status: "Starts December 2026, exact dates coming soon",
+        seats: "15 seats max",
+        promise: "Go from 'where do I even start?' to using AI with confidence for real tasks every week.",
+    },
+    {
+        id: "ai-at-work-wed-1",
+        level: "Intermediate",
+        day: "Wednesday Nights",
+        title: "AI at Work (Intermediate)",
+        schedule: "4 weekly sessions (90 mins each)",
+        status: "Starts December 2026, exact dates coming soon",
+        seats: "15 seats max",
+        promise: "Turn hit-and-miss prompting into a personal prompt library and one reliable weekly workflow.",
+    },
+]
 
-export default function OfferingsAndCohorts(props: Props) {
+/**
+ * @framerSupportedLayoutWidth any-prefer-fixed
+ * @framerSupportedLayoutHeight auto
+ */
+export default function OfferingsAndCohorts(props) {
     const {
-        primaryColor = "#14213D",
-        accentColor = "#C86D2D",
-        creamColor = "#FAF8F5",
+        primaryColor,
+        accentColor,
+        webhookUrl,
+        quizUrl,
         showWaysToWork = true,
-        waysTitle = "Ways to work with me",
-        offerings = DEFAULT_OFFERINGS,
-        cohortsTitle = "December 2026 cohorts",
-        cohortsIntro = "Live online, small groups, Israel time. Exact dates are coming soon, so join the priority waitlist and you'll hear first, before seats open to everyone.",
-        cohorts = COHORTS,
-        showCohortsSection = true,
-        showCohortsHeader = true,
-        showCards = true,
-        webhookUrl = "",
-        privacyUrl = "/privacy",
-        style,
+        showCohortHeading = true,
+        showCohortCards = true,
+        showWaitlist = true,
     } = props
-    const accentDark = shade(accentColor, 0.84)
-    const list = (cohorts && cohorts.length ? cohorts : COHORTS).filter((c) => c.visible !== false)
+    const accentAA = shade(accentColor, 0.75)
+    // When the cards come from the CMS on the canvas, the waitlist form stays open and gets a cohort picker.
+    const standaloneWaitlist = !showCohortCards && showWaitlist
+    const cohortOptions = COHORTS.map((c) => `${c.title}, ${c.day}`)
+    const [selectedCohort, setSelectedCohort] = useState<string | null>(null)
+    const [sending, setSending] = useState(false)
+    const [error, setError] = useState("")
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [consent, setConsent] = useState(false)
+    const [sent, setSent] = useState(false)
 
-    const [firstName, setFirstName] = React.useState("")
-    const [email, setEmail] = React.useState("")
-    const [cohortChoice, setCohortChoice] = React.useState(list[0]?.title ?? "")
-    const [consent, setConsent] = React.useState(false)
-    const [state, setState] = React.useState<"idle" | "sending" | "done" | "error">("idle")
-    const [fieldError, setFieldError] = React.useState("")
-
-    const pickCohort = (title: string) => {
-        setCohortChoice(title)
-        if (typeof document !== "undefined") document.getElementById("jy-waitlist-name")?.focus()
-    }
-
-    const submit = async (e: React.FormEvent) => {
+    const submitWaitlist = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!firstName.trim()) return setFieldError("Please add your first name.")
-        if (!EMAIL_RE.test(email.trim())) return setFieldError("Please check your email address.")
-        setFieldError("")
-        const chosen = list.find((c) => c.title === cohortChoice)
-        const payload = {
-            event: "waitlist_join",
-            firstName: firstName.trim(),
-            email: email.trim(),
-            cohort: cohortChoice,
-            level: chosen?.level ?? "",
-            marketingConsent: consent,
-            submittedAt: new Date().toISOString(),
-            timezone: "Asia/Jerusalem",
-            page: typeof window !== "undefined" ? window.location.pathname : "",
+        setError("")
+        const cohort = selectedCohort || (standaloneWaitlist ? cohortOptions[0] : null)
+        // Success only when the webhook accepts the data (or when no webhook is set yet).
+        if (webhookUrl) {
+            setSending(true)
+            try {
+                const res = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        event_type: "waitlist_join",
+                        name,
+                        email,
+                        cohort,
+                        marketingConsent: consent,
+                    }),
+                })
+                if (!res.ok) throw new Error(`Status ${res.status}`)
+            } catch (err) {
+                console.error(err)
+                setSending(false)
+                setError("Sorry, that didn't go through. Please check your connection and try again in a moment.")
+                return
+            }
+            setSending(false)
         }
-        if (!webhookUrl) {
-            setState("done")
-            return
-        }
-        setState("sending")
-        try {
-            const res = await fetch(webhookUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-            setState(res.ok ? "done" : "error")
-        } catch {
-            setState("error")
-        }
+        if (!selectedCohort && cohort) setSelectedCohort(cohort)
+        setSent(true)
     }
-
-    const css = `
-.jy-oc { container-type: inline-size; }
-.jy-oc a:focus-visible, .jy-oc button:focus-visible, .jy-oc input:focus-visible, .jy-oc select:focus-visible { outline: 3px solid ${accentColor}; outline-offset: 2px; }
-.jy-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.jy-btn { display: inline-block; text-decoration: none; font-weight: 600; font-size: 15.5px; padding: 12px 20px; border-radius: 999px; border: 0; cursor: pointer; }
-.jy-btn-primary { background: ${accentDark}; color: #FFFFFF; }
-.jy-btn-primary:hover { background: ${primaryColor}; }
-.jy-btn-ghost { border: 1.5px solid ${primaryColor}; color: ${primaryColor}; background: transparent; }
-.jy-input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid #6B7385; background: #FFFFFF; color: ${primaryColor}; }
-.jy-form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-@container (max-width: 820px) {
-  .jy-grid3, .jy-form-row { grid-template-columns: 1fr; }
-  .jy-oc-inner { padding: 56px 20px !important; }
-}
-`
-    const label: React.CSSProperties = { display: "block", fontSize: 14, fontWeight: 600, marginBottom: 6 }
 
     return (
-        <div className="jy-oc" style={{ ...style, width: "100%", color: primaryColor, fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
-            <style>{css}</style>
+        <div style={{ fontFamily: "Inter, -apple-system, sans-serif", color: "#1D2432" }}>
             {showWaysToWork && (
-                <section id="ways-to-work" aria-labelledby="jy-ways-title" style={{ background: creamColor }}>
-                    <div className="jy-oc-inner" style={{ maxWidth: 1080, margin: "0 auto", padding: "80px 24px", boxSizing: "border-box" }}>
-                        <h2 id="jy-ways-title" style={{ margin: 0, fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 38 }}>{waysTitle}</h2>
-                        <div className="jy-grid3" style={{ marginTop: 28 }}>
-                            {(offerings && offerings.length ? offerings : DEFAULT_OFFERINGS).map((o) => (
-                                <article key={o.title} style={{ background: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid rgba(20,33,61,0.1)", display: "flex", flexDirection: "column", gap: 10 }}>
-                                    <h3 style={{ margin: 0, fontSize: 21 }}>{o.title}</h3>
-                                    <p style={{ margin: 0, fontWeight: 700, color: accentDark }}>{o.price}</p>
-                                    <p style={{ margin: 0, fontSize: 16, lineHeight: 1.55, color: "#2B3550", flexGrow: 1 }}>{o.body}</p>
-                                    <a className="jy-btn jy-btn-ghost" href={o.ctaUrl} style={{ alignSelf: "flex-start", marginTop: 6 }}>{o.ctaLabel}</a>
-                                </article>
-                            ))}
-                        </div>
-                        <p style={{ margin: "28px 0 0", fontSize: 16 }}>
-                            Not sure which fits? <a href="/#quiz" style={{ color: primaryColor, fontWeight: 700 }}>Take the 3 minute AI level check</a> and I'll point you to the right one.
+            <section id="ways-to-work" style={{ background: "#FFFFFF", padding: "72px 20px" }}>
+                <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+                    <div style={{ maxWidth: 680, marginBottom: 40 }}>
+                        <h2 style={{ fontSize: 32, color: primaryColor, margin: "0 0 12px" }}>
+                            Pick the format that fits what you need
+                        </h2>
+                        <p style={{ fontSize: 17, color: "#4A5568", lineHeight: 1.6, margin: 0 }}>
+                            Every engagement is built around one promise: it will move you a couple of steps further so you feel you got clear value for your money.
                         </p>
                     </div>
-                </section>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+                        <div style={{ border: `2px solid ${primaryColor}`, borderRadius: 12, padding: 28, background: "#FFFFFF" }}>
+                            <span style={{ background: "#FDF0E6", color: accentAA, fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 6 }}>
+                                MOST POPULAR
+                            </span>
+                            <h3 style={{ fontSize: 22, color: primaryColor, margin: "12px 0 8px" }}>Small-Group Live Courses</h3>
+                            <p style={{ fontSize: 28, fontWeight: 800, color: primaryColor, margin: "0 0 12px" }}>
+                                600 ILS <span style={{ fontSize: 15, fontWeight: 400, color: "#4A5568" }}>/ full course</span>
+                            </p>
+                            <p style={{ lineHeight: 1.6, color: "#4A5568" }}>
+                                Learn alongside peers at your exact skill level. Live Zoom sessions, small hands-on breakout rooms, and a private group chat between classes.
+                            </p>
+                            <ul style={{ paddingLeft: 20, lineHeight: 1.7, marginBottom: 24 }}>
+                                <li>Max 15 people per group</li>
+                                <li>2 Beginner groups on Sundays</li>
+                                <li>1 Intermediate group on Wednesdays</li>
+                            </ul>
+                            <a
+                                href="#cohorts"
+                                style={{
+                                    display: "block",
+                                    textAlign: "center",
+                                    background: accentAA,
+                                    color: "#FFFFFF",
+                                    padding: "13px 20px",
+                                    borderRadius: 8,
+                                    fontWeight: 600,
+                                    textDecoration: "none",
+                                }}
+                            >
+                                Explore December Courses
+                            </a>
+                        </div>
+
+                        <div style={{ border: "1px solid #E2DFD9", borderRadius: 12, padding: 28, background: "#FFFFFF" }}>
+                            <span style={{ background: "#FDF0E6", color: accentAA, fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 6 }}>
+                                LIMITED 40-SLOT RELEASE
+                            </span>
+                            <h3 style={{ fontSize: 22, color: primaryColor, margin: "12px 0 8px" }}>Private 1:1 Coaching</h3>
+                            <p style={{ fontSize: 28, fontWeight: 800, color: primaryColor, margin: "0 0 12px" }}>
+                                From 400 ILS <span style={{ fontSize: 15, fontWeight: 400, color: "#4A5568" }}>/ session</span>
+                            </p>
+                            <p style={{ lineHeight: 1.6, color: "#4A5568" }}>
+                                One full hour tailored to your screen and work. Only 40 private sessions are released across five tiers (400, 600, 750, 950, and 1,200 ILS).
+                            </p>
+                            <ul style={{ paddingLeft: 20, lineHeight: 1.7, marginBottom: 24 }}>
+                                <li>60-minute private Zoom session</li>
+                                <li>Tailored prep checklist included</li>
+                                <li>Opens week of Nov 29, 2026</li>
+                            </ul>
+                            <a
+                                href="#coaching"
+                                style={{
+                                    display: "block",
+                                    textAlign: "center",
+                                    background: "#FFFFFF",
+                                    color: primaryColor,
+                                    border: `2px solid ${primaryColor}`,
+                                    padding: "11px 20px",
+                                    borderRadius: 8,
+                                    fontWeight: 600,
+                                    textDecoration: "none",
+                                }}
+                            >
+                                Book a 1:1 Session
+                            </a>
+                        </div>
+
+                        <div style={{ border: "1px solid #E2DFD9", borderRadius: 12, padding: 28, background: "#FFFFFF" }}>
+                            <span style={{ background: "#FDF0E6", color: accentAA, fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 6 }}>
+                                FOR ORGANIZATIONS & COMPANIES
+                            </span>
+                            <h3 style={{ fontSize: 22, color: primaryColor, margin: "12px 0 8px" }}>Custom Workflow Builds</h3>
+                            <p style={{ fontSize: 28, fontWeight: 800, color: primaryColor, margin: "0 0 12px" }}>
+                                Custom Quote <span style={{ fontSize: 15, fontWeight: 400, color: "#4A5568" }}>/ project</span>
+                            </p>
+                            <p style={{ lineHeight: 1.6, color: "#4A5568" }}>
+                                Want me to build the workflow for you? I analyze your team's repetitive tasks, build a working AI workflow, and hand it over ready to use.
+                            </p>
+                            <ul style={{ paddingLeft: 20, lineHeight: 1.7, marginBottom: 24 }}>
+                                <li>20-minute discovery call first</li>
+                                <li>Custom assistants & automations</li>
+                                <li>Team walkthrough & plain guide</li>
+                            </ul>
+                            <a
+                                href="#workflows"
+                                style={{
+                                    display: "block",
+                                    textAlign: "center",
+                                    background: "#FFFFFF",
+                                    color: primaryColor,
+                                    border: `2px solid ${primaryColor}`,
+                                    padding: "11px 20px",
+                                    borderRadius: 8,
+                                    fontWeight: 600,
+                                    textDecoration: "none",
+                                }}
+                            >
+                                Contact Me for a Quote
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
             )}
 
-            {showCohortsSection && (
-            <section id={showCohortsHeader ? "cohorts" : "cohorts-waitlist"} aria-labelledby={showCohortsHeader ? "jy-cohorts-title" : "jy-waitlist-title"} style={{ background: "#FFFFFF" }}>
-                <div className="jy-oc-inner" style={{ maxWidth: 1080, margin: "0 auto", padding: showCohortsHeader ? "80px 24px" : "0 24px 80px", boxSizing: "border-box" }}>
-                    {showCohortsHeader && (
-                        <>
-                            <h2 id="jy-cohorts-title" style={{ margin: 0, fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 38 }}>{cohortsTitle}</h2>
-                            <p style={{ margin: "14px 0 0", fontSize: 18, lineHeight: 1.55, maxWidth: 700, color: "#2B3550" }}>{cohortsIntro}</p>
-                        </>
-                    )}
-
-                    {showCards && (
-                    <div style={{ marginTop: 28 }}>
-                            <div className="jy-grid3">
-                                {list.map((c) => {
-                                    const full = c.status === "Full" || c.seatsRemaining <= 0
-                                    return (
-                                        <article key={c.title} style={{ background: creamColor, borderRadius: 16, padding: 24, border: "1px solid rgba(20,33,61,0.1)", display: "flex", flexDirection: "column", gap: 10 }}>
-                                            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: accentDark }}>{c.level}, {c.day} nights</p>
-                                            <h3 style={{ margin: 0, fontSize: 21 }}>{c.title}</h3>
-                                            <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.55 }}>{c.promise}</p>
-                                            <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.5, color: "#4A5468", flexGrow: 1 }}>{c.schedule}</p>
-                                            <p style={{ margin: 0, fontWeight: 700 }}>
-                                                ₪{c.price} per person · {full ? "Full, waitlist only" : `${c.seatsRemaining} of 15 seats left`} · {c.status}
-                                            </p>
-                                            {c.paymentUrl && c.status === "Open" && !full ? (
-                                                <a className="jy-btn jy-btn-primary" href={c.paymentUrl} style={{ alignSelf: "flex-start" }}>Save my seat</a>
-                                            ) : (
-                                                <button type="button" className="jy-btn jy-btn-primary" onClick={() => pickCohort(c.title)} style={{ alignSelf: "flex-start" }}>
-                                                    Join the priority waitlist
-                                                </button>
-                                            )}
-                                        </article>
-                                    )
-                                })}
-                            </div>
-                    </div>
-                    )}
-
-                    <div style={{ marginTop: showCards || showCohortsHeader ? 40 : 0, background: primaryColor, color: "#FFFFFF", borderRadius: 20, padding: 28 }}>
-                        <h3 id="jy-waitlist-title" style={{ margin: 0, fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 26 }}>Want to save your seat?</h3>
-                        <p style={{ margin: "8px 0 20px", fontSize: 16, lineHeight: 1.5, color: "#E6E9F0" }}>
-                            Join the priority waitlist. I'll email you the dates first, before seats open to everyone. No payment today.
+            {(showCohortHeading || showCohortCards || showWaitlist) && (
+            <section
+                id={showCohortHeading ? "cohorts" : "cohort-waitlist"}
+                style={{
+                    background: "#FAF8F5",
+                    padding: `${showCohortHeading ? 72 : 40}px 20px ${showCohortCards || showWaitlist ? 72 : 16}px`,
+                }}
+            >
+                <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+                    {showCohortHeading && (
+                    <div style={{ maxWidth: 680, marginBottom: showCohortCards ? 40 : 0 }}>
+                        <h2 style={{ fontSize: 32, color: primaryColor, margin: "0 0 12px" }}>
+                            December 2026 Small-Group Courses
+                        </h2>
+                        <p style={{ fontSize: 17, color: "#4A5568", lineHeight: 1.6, margin: 0 }}>
+                            Live online, capped at 15 people per group. Two Beginner cohorts on Sunday nights and one Intermediate cohort on Wednesday nights.
                         </p>
-                        {state === "done" ? (
-                            <p role="status" style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>
-                                You're on the list, {firstName.trim() || "friend"}. Watch your inbox, I'll be in touch as soon as dates are set.
-                            </p>
-                        ) : (
-                            <form onSubmit={submit} aria-labelledby="jy-waitlist-title" noValidate>
-                                <div className="jy-form-row">
-                                    <div>
-                                        <label htmlFor="jy-waitlist-name" style={label}>First name</label>
-                                        <input id="jy-waitlist-name" className="jy-input" aria-label="First name" autoComplete="given-name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Dana" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="jy-waitlist-email" style={label}>Email</label>
-                                        <input id="jy-waitlist-email" className="jy-input" type="email" aria-label="Email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="jy-waitlist-cohort" style={label}>Cohort</label>
-                                        <select id="jy-waitlist-cohort" className="jy-input" aria-label="Cohort" value={cohortChoice} onChange={(e) => setCohortChoice(e.target.value)}>
-                                            {list.map((c) => (
-                                                <option key={c.title} value={c.title}>{c.title}</option>
-                                            ))}
-                                            <option value="1:1 coaching">1:1 coaching</option>
-                                            <option value="Not sure yet">Not sure yet</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginTop: 16, fontSize: 14.5, lineHeight: 1.45, color: "#E6E9F0" }}>
-                                    <input type="checkbox" aria-label="Marketing emails consent" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ width: 20, height: 20, marginTop: 1 }} />
-                                    <span>Yes, also send me occasional AI tips and course news. Optional, and you can unsubscribe any time.</span>
-                                </label>
-                                {fieldError && <p role="alert" style={{ margin: "12px 0 0", color: "#FFD7B8", fontWeight: 600 }}>{fieldError}</p>}
-                                {state === "error" && (
-                                    <p role="alert" style={{ margin: "12px 0 0", color: "#FFD7B8", fontWeight: 600 }}>
-                                        Sorry, that didn't go through. Please try again in a moment.
-                                    </p>
-                                )}
-                                <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", marginTop: 18 }}>
-                                    <button type="submit" className="jy-btn jy-btn-primary" disabled={state === "sending"}>
-                                        {state === "sending" ? "Sending..." : state === "error" ? "Try again" : "Join the priority waitlist"}
-                                    </button>
-                                    <span style={{ fontSize: 13.5, color: "#C9CFDB" }}>
-                                        I use your details only for this. <a href={privacyUrl} style={{ color: "#FFFFFF" }}>Privacy policy</a>.
-                                    </span>
-                                </div>
-                            </form>
-                        )}
                     </div>
+                    )}
+
+                    {showCohortCards && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+                        {COHORTS.map((c) => (
+                            <div key={c.id} style={{ background: "#FFFFFF", border: "1px solid #E2DFD9", borderRadius: 12, padding: 28 }}>
+                                <span style={{ background: "#FDF0E6", color: accentAA, fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 6 }}>
+                                    {c.day}
+                                </span>
+                                <h3 style={{ fontSize: 22, color: primaryColor, margin: "12px 0 8px" }}>{c.title}</h3>
+                                <p style={{ fontSize: 26, fontWeight: 800, color: primaryColor, margin: "0 0 12px" }}>
+                                    600 ILS <span style={{ fontSize: 14, fontWeight: 400, color: "#4A5568" }}>/ full course</span>
+                                </p>
+                                <p style={{ lineHeight: 1.6 }}>{c.promise}</p>
+                                <p style={{ fontSize: 14, color: "#4A5568" }}>
+                                    <strong>Format:</strong> {c.schedule}
+                                </p>
+                                <p style={{ fontSize: 14, color: "#4A5568", marginBottom: 20 }}>
+                                    <strong>Status:</strong> {c.status} ({c.seats})
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedCohort(`${c.title} (${c.day})`)
+                                        setSent(false)
+                                    }}
+                                    style={{
+                                        width: "100%",
+                                        background: accentAA,
+                                        color: "#FFFFFF",
+                                        border: "none",
+                                        padding: "13px 20px",
+                                        borderRadius: 8,
+                                        fontWeight: 600,
+                                        fontSize: 15,
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    Join Priority Waitlist
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                    )}
+
+                    {showWaitlist && (selectedCohort || standaloneWaitlist) && (
+                        <div
+                            id="waitlist"
+                            style={{
+                                marginTop: standaloneWaitlist ? 0 : 32,
+                                background: "#FFFFFF",
+                                border: `2px solid ${primaryColor}`,
+                                borderRadius: 12,
+                                padding: 28,
+                                maxWidth: 560,
+                            }}
+                        >
+                            {sent ? (
+                                <div role="status">
+                                    <h3 style={{ color: primaryColor, margin: "0 0 8px" }}>You're on the priority list!</h3>
+                                    <p style={{ margin: 0 }}>
+                                        I've saved your spot on the waitlist for <strong>{selectedCohort}</strong> and will email you as soon as exact December dates open.
+                                    </p>
+                                </div>
+                            ) : (
+                                <form onSubmit={submitWaitlist} aria-label="Join the priority waitlist">
+                                    <h3 style={{ color: primaryColor, margin: "0 0 8px" }}>
+                                        {standaloneWaitlist ? "Join the Priority Waitlist" : `Join Waitlist: ${selectedCohort}`}
+                                    </h3>
+                                    <p style={{ fontSize: 15, color: "#4A5568", marginBottom: 16 }}>
+                                        Be first in line to claim one of the 15 seats when December dates go live.
+                                    </p>
+                                    {standaloneWaitlist && (
+                                        <>
+                                            <label htmlFor="jy-wl-cohort" style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 6 }}>
+                                                Which group? *
+                                            </label>
+                                            <select
+                                                id="jy-wl-cohort"
+                                                required
+                                                aria-label="Which group would you like to join"
+                                                value={selectedCohort || cohortOptions[0]}
+                                                onChange={(e) => setSelectedCohort(e.target.value)}
+                                                style={{ width: "100%", padding: 12, borderRadius: 8, border: "1px solid #8A857C", marginBottom: 12, fontSize: 16, background: "#FFFFFF", color: "#1D2432" }}
+                                            >
+                                                {cohortOptions.map((o) => (
+                                                    <option key={o} value={o}>{o}</option>
+                                                ))}
+                                            </select>
+                                        </>
+                                    )}
+                                    <input
+                                        type="text"
+                                        required
+                                        aria-label="First name"
+                                        autoComplete="given-name"
+                                        placeholder="First Name *"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        style={{ width: "100%", padding: 12, borderRadius: 8, border: "1px solid #8A857C", marginBottom: 12, fontSize: 16 }}
+                                    />
+                                    <input
+                                        type="email"
+                                        required
+                                        aria-label="Email address"
+                                        autoComplete="email"
+                                        placeholder="Email Address *"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        style={{ width: "100%", padding: 12, borderRadius: 8, border: "1px solid #8A857C", marginBottom: 14, fontSize: 16 }}
+                                    />
+                                    <label style={{ display: "flex", gap: 10, fontSize: 14, color: "#4A5568", marginBottom: 16 }}>
+                                        <input type="checkbox" aria-label="Send me occasional practical AI tips and updates on future courses" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ marginTop: 3 }} />
+                                        <span>Yes, send me occasional practical AI tips and updates on future courses.</span>
+                                    </label>
+                                    {error && (
+                                        <p role="alert" style={{ color: "#9B1C1C", fontSize: 14, margin: "0 0 12px" }}>{error}</p>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={sending}
+                                        style={{
+                                            width: "100%",
+                                            background: accentAA,
+                                            color: "#FFFFFF",
+                                            padding: 13,
+                                            border: "none",
+                                            borderRadius: 8,
+                                            fontWeight: 600,
+                                            fontSize: 16,
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        {sending ? "Saving..." : error ? "Try Again" : "Save My Waitlist Spot"}
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+                    )}
+
+                    {(showCohortCards || showWaitlist) && (
+                    <div style={{ marginTop: 32 }}>
+                        <a href={quizUrl} style={{ color: primaryColor, fontWeight: 700, fontSize: 17 }}>
+                            Not sure which group matches your level? Take the 2-Minute Check &rarr;
+                        </a>
+                    </div>
+                    )}
                 </div>
             </section>
             )}
@@ -329,52 +395,12 @@ export default function OfferingsAndCohorts(props: Props) {
 }
 
 addPropertyControls(OfferingsAndCohorts, {
-    primaryColor: { type: ControlType.Color, title: "Primary", defaultValue: "#14213D" },
-    accentColor: { type: ControlType.Color, title: "Accent", defaultValue: "#C86D2D" },
-    creamColor: { type: ControlType.Color, title: "Cream", defaultValue: "#FAF8F5" },
-    webhookUrl: { type: ControlType.String, title: "Webhook URL", defaultValue: "", placeholder: "Paste the n8n webhook URL" },
-    showWaysToWork: { type: ControlType.Boolean, title: "Ways to work", defaultValue: true },
-    waysTitle: { type: ControlType.String, title: "Ways title", defaultValue: "Ways to work with me", hidden: (p: any) => !p.showWaysToWork },
-    offerings: {
-        type: ControlType.Array,
-        title: "Offerings",
-        hidden: (p: any) => !p.showWaysToWork,
-        control: {
-            type: ControlType.Object,
-            controls: {
-                title: { type: ControlType.String },
-                price: { type: ControlType.String },
-                body: { type: ControlType.String, displayTextArea: true },
-                ctaLabel: { type: ControlType.String },
-                ctaUrl: { type: ControlType.String },
-            },
-        },
-        defaultValue: DEFAULT_OFFERINGS,
-    },
-    cohortsTitle: { type: ControlType.String, title: "Cohorts title", defaultValue: "December 2026 cohorts" },
-    cohortsIntro: { type: ControlType.String, title: "Cohorts intro", displayTextArea: true, defaultValue: "Live online, small groups, Israel time. Exact dates are coming soon, so join the priority waitlist and you'll hear first, before seats open to everyone." },
-    showCohortsSection: { type: ControlType.Boolean, title: "Cohorts section", defaultValue: true },
-    showCohortsHeader: { type: ControlType.Boolean, title: "Cohort header", defaultValue: true, hidden: (p: any) => !p.showCohortsSection },
-    showCards: { type: ControlType.Boolean, title: "Cards", defaultValue: true, hidden: (p: any) => !p.showCohortsSection },
-    cohorts: {
-        type: ControlType.Array,
-        title: "Cohorts (fallback)",
-        control: {
-            type: ControlType.Object,
-            controls: {
-                title: { type: ControlType.String },
-                level: { type: ControlType.Enum, options: ["Beginner", "Intermediate", "Advanced", "Expert"] },
-                day: { type: ControlType.String },
-                schedule: { type: ControlType.String, displayTextArea: true },
-                price: { type: ControlType.Number, min: 0, max: 10000 },
-                seatsRemaining: { type: ControlType.Number, min: 0, max: 15, step: 1 },
-                status: { type: ControlType.Enum, options: ["Waitlist", "Open", "Full"] },
-                visible: { type: ControlType.Boolean },
-                promise: { type: ControlType.String, displayTextArea: true },
-                paymentUrl: { type: ControlType.String, title: "Payment URL" },
-            },
-        },
-        defaultValue: COHORTS,
-    },
-    privacyUrl: { type: ControlType.String, title: "Privacy URL", defaultValue: "/privacy" },
+    primaryColor: { type: ControlType.Color, title: "Primary Navy", defaultValue: "#14213D" },
+    accentColor: { type: ControlType.Color, title: "Accent Amber", defaultValue: "#C86D2D" },
+    webhookUrl: { type: ControlType.String, title: "n8n Webhook URL", defaultValue: "" },
+    quizUrl: { type: ControlType.String, title: "Quiz Anchor or URL", defaultValue: "#quiz" },
+    showWaysToWork: { type: ControlType.Boolean, title: "Ways to Work", defaultValue: true },
+    showCohortHeading: { type: ControlType.Boolean, title: "Cohorts Heading", defaultValue: true },
+    showCohortCards: { type: ControlType.Boolean, title: "Built-in Cohort Cards", description: "Turn off when the CMS cohort cards sit on the canvas.", defaultValue: true },
+    showWaitlist: { type: ControlType.Boolean, title: "Waitlist Form", defaultValue: true },
 })

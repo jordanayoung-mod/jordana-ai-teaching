@@ -4,64 +4,74 @@
     "Slug": "ai-starter-sunday-a",
     "Level": "Beginner",
     "Day": "Sunday",
-    "Schedule Details": "3 weekly Sunday evening sessions on Zoom, Israel time: Session 1 (90 min), Session 2 (90 min), Session 3 (60 min live clinic and wrap-up). Starts December 2026, exact dates coming soon.",
+    "Schedule Details": "3 weekly Sunday night sessions, live on Zoom, Israel time. Sessions 1 and 2 are 90 minutes, Session 3 is a 60-minute live clinic and wrap-up. Max 15 people, with 3-person breakout rooms and a private group chat between sessions. Starts December 2026, exact dates coming soon.",
     "Price": 600,
     "Seats Remaining": 15,
     "Status": "Waitlist",
     "Visible": true,
     "Promise": "Go from \"where do I even start?\" to using AI with confidence for real tasks every week.",
-    "Payment Link": ""
+    "Payment Link": "",
+    "Sessions": "Session 1 (90 min): Speaking AI's Language Without Overthinking. Session 2 (90 min): Writing in Your Voice and Spotting Mistakes. Session 3 (60 min): Live Clinic, Capstone and Next Steps.",
+    "Outcomes": "Give AI clear instructions that produce useful results on the first try. Draft emails, summaries and everyday plans in half the time. Know what personal or work information is safe to share and what to keep private. Spot when AI is guessing before relying on its answer. Leave with three saved, reusable prompts you use every week."
   },
   {
     "Title": "AI Starter, Sunday Group B",
     "Slug": "ai-starter-sunday-b",
     "Level": "Beginner",
     "Day": "Sunday",
-    "Schedule Details": "3 weekly Sunday evening sessions on Zoom, Israel time: Session 1 (90 min), Session 2 (90 min), Session 3 (60 min live clinic and wrap-up). Starts December 2026, exact dates coming soon.",
+    "Schedule Details": "3 weekly Sunday night sessions, live on Zoom, Israel time. Sessions 1 and 2 are 90 minutes, Session 3 is a 60-minute live clinic and wrap-up. Max 15 people, with 3-person breakout rooms and a private group chat between sessions. Starts December 2026, exact dates coming soon.",
     "Price": 600,
     "Seats Remaining": 15,
     "Status": "Waitlist",
     "Visible": true,
     "Promise": "Go from \"where do I even start?\" to using AI with confidence for real tasks every week.",
-    "Payment Link": ""
+    "Payment Link": "",
+    "Sessions": "Session 1 (90 min): Speaking AI's Language Without Overthinking. Session 2 (90 min): Writing in Your Voice and Spotting Mistakes. Session 3 (60 min): Live Clinic, Capstone and Next Steps.",
+    "Outcomes": "Give AI clear instructions that produce useful results on the first try. Draft emails, summaries and everyday plans in half the time. Know what personal or work information is safe to share and what to keep private. Spot when AI is guessing before relying on its answer. Leave with three saved, reusable prompts you use every week."
   },
   {
     "Title": "AI at Work, Wednesday Group",
     "Slug": "ai-at-work-wednesday",
     "Level": "Intermediate",
     "Day": "Wednesday",
-    "Schedule Details": "4 weekly Wednesday evening sessions on Zoom, 90 min each, Israel time. Starts December 2026, exact dates coming soon.",
+    "Schedule Details": "4 weekly Wednesday night sessions of 90 minutes, live on Zoom, Israel time. Max 15 people, with breakout rooms and a private group chat. Starts December 2026, exact dates coming soon.",
     "Price": 600,
     "Seats Remaining": 15,
     "Status": "Waitlist",
     "Visible": true,
     "Promise": "Turn hit-and-miss prompting into a personal prompt library and one reliable weekly workflow.",
-    "Payment Link": ""
+    "Payment Link": "",
+    "Sessions": "Session 1: Building Your Personal Prompt Library. Session 2: Working Safely With PDFs, Spreadsheets and Notes. Session 3: Chaining Steps for Complex Work (outline, critique, final draft). Session 4: Capstone Workflow Build and Demo Day.",
+    "Outcomes": "Build a structured personal prompt library with bracketed inputs. Upload PDFs, spreadsheets and meeting transcripts to pull out accurate insights fast. Use 3-step prompt chaining for complex work projects. Build and test one repeatable weekly workflow that saves at least 2 hours a week."
   },
   {
     "Title": "AI Power User",
     "Slug": "ai-power-user",
     "Level": "Advanced",
     "Day": "To be scheduled",
-    "Schedule Details": "4 weekly sessions of 90 min on Zoom, Israel time. Curriculum drafted, opening Q1 2027.",
+    "Schedule Details": "4 weekly 90-minute sessions, live on Zoom, Israel time. Drafted for Q1 2027.",
     "Price": 600,
     "Seats Remaining": 15,
     "Status": "Waitlist",
     "Visible": false,
-    "Promise": "Work with files and data and build your own custom AI assistant that saves you real hours.",
-    "Payment Link": ""
+    "Promise": "Put AI to work on your own files and data, and build a tested custom assistant (Custom GPT, Claude Project, or Copilot agent).",
+    "Payment Link": "",
+    "Sessions": "Session 1: Anatomy of a Custom Assistant. Session 2: Grounding and Knowledge Files. Session 3: Testing, Guardrails and Failure Modes. Session 4: Capstone Launch and 1-Page User Guide.",
+    "Outcomes": ""
   },
   {
     "Title": "Agents and Automation",
     "Slug": "agents-and-automation",
     "Level": "Expert",
     "Day": "To be scheduled",
-    "Schedule Details": "4 weekly sessions of 90 min on Zoom, Israel time. Curriculum drafted, opening Q1 2027.",
+    "Schedule Details": "4 weekly 90-minute sessions, live on Zoom, Israel time. Drafted for Q1 2027.",
     "Price": 600,
     "Seats Remaining": 15,
     "Status": "Waitlist",
     "Visible": false,
-    "Promise": "Design, build and safely pilot an AI automation or agent on a real process.",
-    "Payment Link": ""
+    "Promise": "Design, build, and safely pilot an agent or automation for a real process.",
+    "Payment Link": "",
+    "Sessions": "Session 1: Process Mapping and Human-in-the-Loop Checkpoints. Session 2: Triggers and Structured Outputs. Session 3: Error Handling and Privacy Guardrails. Session 4: Capstone Pilot Demo.",
+    "Outcomes": ""
   }
 ]

@@ -1,228 +1,402 @@
 import * as React from "react"
+import { useState } from "react"
 import { addPropertyControls, ControlType } from "framer"
 
-/**
- * WorkflowBuildsAndAbout: Company workflow builds (#workflows) with a quote form
- * that POSTs { event: "b2b_quote", ... } to webhookUrl, the About section (#about)
- * with LinkedIn, and a short FAQ (#faq). Each part can be switched on or off so
- * the same component serves Home, Company Builds and About.
- *
- * @framerSupportedLayoutWidth any-prefer-fixed
- * @framerSupportedLayoutHeight auto
- */
-
-interface Faq {
-    q: string
-    a: string
-}
-
-interface Props {
-    primaryColor: string
-    accentColor: string
-    creamColor: string
-    showBuilds: boolean
-    showAbout: boolean
-    showFaq: boolean
-    webhookUrl: string
-    discoveryCallUrl: string
-    linkedinUrl: string
-    privacyUrl: string
-    aboutBody: string
-    faqs: Faq[]
-    style?: React.CSSProperties
-}
-
-const DEFAULT_FAQS: Faq[] = [
-    { q: "How do the live courses work?", a: "Each course is a small live group of up to 15 people. AI Starter is 3 weekly sessions (90 min, 90 min, then a 60 min live clinic). AI at Work is 4 weekly sessions of 90 min. You practise in small breakout rooms on your own real tasks, and there's a private group chat between sessions." },
-    { q: "Where do the sessions happen?", a: "Live on Zoom, in English. All times are Israel time (IST). You'll need a laptop. A phone alone isn't enough for the hands-on parts." },
-    { q: "What if I need to cancel?", a: "You can cancel a booking made on this site within 14 days, in line with the Israeli Consumer Protection Law rules for distance transactions. If something comes up, just write to me. Full details are in the Terms." },
-    { q: "How does the level check work?", a: "It's 12 short questions and takes about 3 minutes. Your answers give a score out of 30 that places you at Beginner, Intermediate, Advanced or Expert, and you'll see the group that fits you right away." },
-    { q: "Do you build things for companies?", a: "Yes. I design and build AI workflows and assistants for teams. We start with a free 20 minute discovery call, then you get a fixed quote. Everything is set up in your own accounts, so you own it." },
-]
-
-const DEFAULT_ABOUT =
-    "I'm Jordana Young. I'm part of the Microsoft team building Copilot Studio, the tool companies use to build their own AI agents. Before that I spent 20+ years shaping products and customer experiences at Microsoft, Meta, HoneyBook and SodaStream. I've watched thousands of people try AI for the first time, and I know where they get stuck. My courses skip the jargon and focus on what you actually do every week, so every session moves you a couple of steps further."
-
+// WCAG AA: a darker shade of the accent for text and for backgrounds behind white text.
 function shade(hex: string, factor: number) {
-    const h = hex.replace("#", "")
+    const h = (hex || "").replace("#", "")
     if (h.length !== 6) return hex
     const n = [0, 2, 4].map((i) => Math.round(parseInt(h.slice(i, i + 2), 16) * factor))
     return "#" + n.map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("")
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PLAYBOOK_ITEMS = [
+    {
+        level: "Beginner",
+        useCase: "Writing",
+        title: "The 3-Part Email Prompt That Never Sounds Robotic",
+        summary: "Stop getting stiff replies. Give AI your role, context, and two real examples of how you write.",
+    },
+    {
+        level: "Beginner",
+        useCase: "AI at Home",
+        title: "Turn a Messy Fridge Photo Into a 4-Day Dinner Plan",
+        summary: "Snap a quick photo of what is in your kitchen and get a practical meal plan plus a grouped shopping list.",
+    },
+    {
+        level: "Intermediate",
+        useCase: "Work Productivity",
+        title: "Meeting Transcript to Action Table in 15 Seconds",
+        summary: "A copy-and-paste instruction that extracts decisions, owners, and open questions from any call transcript.",
+    },
+    {
+        level: "Intermediate",
+        useCase: "Research",
+        title: "How to Spot When AI Is Guessing",
+        summary: "Three verification prompts to keep AI honest when summarizing PDFs or comparing quotes.",
+    },
+]
 
-export default function WorkflowBuildsAndAbout(props: Props) {
+const FAQS = [
+    {
+        q: "How do the small-group courses work?",
+        a: "Each group is live online with up to 15 people at your level. AI Starter (Beginner) runs on Sunday nights: 3 weekly sessions of 90, 90 and 60 minutes. AI at Work (Intermediate) runs on Wednesday nights: 4 weekly sessions of 90 minutes. You work on your own real tasks in small breakout rooms, and there's a private group chat between classes.",
+    },
+    {
+        q: "How much does it cost, and how do I pay?",
+        a: "Each December course is 600 ILS for the full course. Private 1:1 sessions start at 400 ILS and the price steps up as each tier of 8 sessions fills. You can pay by Israeli credit card or Bit, and you get an official tax invoice.",
+    },
+    {
+        q: "What if I need to cancel or reschedule?",
+        a: "You can reschedule a 1:1 session free of charge with 24 hours' notice. Cancellations follow the Israeli Consumer Protection Law: within 14 days of purchase and at least 2 business days before a 1:1 session, or 7 business days before a group start date. The full details are in the Terms.",
+    },
+    {
+        q: "How does the AI Level Check work?",
+        a: "It's 12 quick questions and takes about 2 minutes. Your answers give you a score out of 30 and place you at Beginner, Intermediate, Advanced or Expert, with the course or session that fits you best.",
+    },
+    {
+        q: "I'm Advanced or Expert. Is there a group for me?",
+        a: "Advanced and Expert groups open in early 2027. Until then, book a 1:1 session, ask me for a custom workflow build, or join the priority waitlist so you hear first.",
+    },
+    {
+        q: "Do you build AI workflows for companies?",
+        a: "Yes. Fill in the form above and I'll reply within one business day to set up a 20-minute discovery call. After that you get a clear quote for the build.",
+    },
+]
+
+/**
+ * @framerSupportedLayoutWidth any-prefer-fixed
+ * @framerSupportedLayoutHeight auto
+ */
+export default function WorkflowBuildsAndAbout(props) {
     const {
-        primaryColor = "#14213D",
-        accentColor = "#C86D2D",
-        creamColor = "#FAF8F5",
-        showBuilds = true,
+        primaryColor,
+        accentColor,
+        linkedinUrl,
+        webhookUrl,
+        quizUrl,
+        showWorkflows = true,
         showAbout = true,
+        showLibrary = true,
         showFaq = true,
-        webhookUrl = "",
-        discoveryCallUrl = "",
-        linkedinUrl = "https://www.linkedin.com/in/jordana-young",
-        privacyUrl = "/privacy",
-        aboutBody = DEFAULT_ABOUT,
-        faqs = DEFAULT_FAQS,
-        style,
     } = props
-    const accentDark = shade(accentColor, 0.84)
-    const [f, setF] = React.useState({ name: "", email: "", company: "", teamSize: "", description: "" })
-    const [state, setState] = React.useState<"idle" | "sending" | "done" | "error">("idle")
-    const [err, setErr] = React.useState("")
-    const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value })
+    const accentAA = shade(accentColor, 0.75)
+    const [b2bSending, setB2bSending] = useState(false)
+    const [b2bError, setB2bError] = useState("")
+    const [b2bName, setB2bName] = useState("")
+    const [b2bEmail, setB2bEmail] = useState("")
+    const [b2bCompany, setB2bCompany] = useState("")
+    const [b2bSize, setB2bSize] = useState("1-10")
+    const [b2bTask, setB2bTask] = useState("")
+    const [b2bConsent, setB2bConsent] = useState(false)
+    const [b2bSent, setB2bSent] = useState(false)
 
-    const submit = async (e: React.FormEvent) => {
+    const [filterLevel, setFilterLevel] = useState("ALL")
+    const [filterUseCase, setFilterUseCase] = useState("ALL")
+
+    const handleB2bSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!f.name.trim() || !f.company.trim() || !f.teamSize || !f.description.trim()) return setErr("Please fill in every field so I can prepare for our call.")
-        if (!EMAIL_RE.test(f.email.trim())) return setErr("Please check your work email address.")
-        setErr("")
-        const payload = {
-            event: "b2b_quote",
-            name: f.name.trim(),
-            workEmail: f.email.trim(),
-            company: f.company.trim(),
-            teamSize: f.teamSize,
-            workflowDescription: f.description.trim(),
-            submittedAt: new Date().toISOString(),
-            timezone: "Asia/Jerusalem",
-            page: typeof window !== "undefined" ? window.location.pathname : "",
+        setB2bError("")
+        // Success only when the webhook accepts the data (or when no webhook is set yet).
+        if (webhookUrl) {
+            setB2bSending(true)
+            try {
+                const res = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        event_type: "b2b_quote",
+                        name: b2bName,
+                        email: b2bEmail,
+                        company: b2bCompany,
+                        teamSize: b2bSize,
+                        taskDescription: b2bTask,
+                        marketingConsent: b2bConsent,
+                    }),
+                })
+                if (!res.ok) throw new Error(`Status ${res.status}`)
+            } catch (err) {
+                console.error(err)
+                setB2bSending(false)
+                setB2bError("Sorry, that didn't go through. Please check your connection and try again in a moment.")
+                return
+            }
+            setB2bSending(false)
         }
-        if (!webhookUrl) return setState("done")
-        setState("sending")
-        try {
-            const res = await fetch(webhookUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-            setState(res.ok ? "done" : "error")
-        } catch {
-            setState("error")
-        }
+        setB2bSent(true)
     }
 
-    const css = `
-.jy-wb { container-type: inline-size; }
-.jy-wb a:focus-visible, .jy-wb button:focus-visible, .jy-wb input:focus-visible, .jy-wb select:focus-visible, .jy-wb textarea:focus-visible, .jy-wb summary:focus-visible { outline: 3px solid ${accentColor}; outline-offset: 2px; }
-.jy-btn { display: inline-block; text-decoration: none; font-weight: 600; font-size: 16px; padding: 13px 22px; border-radius: 999px; border: 0; cursor: pointer; }
-.jy-btn-primary { background: ${accentDark}; color: #FFFFFF; }
-.jy-btn-primary:hover { background: ${primaryColor}; }
-.jy-btn-ghost { border: 1.5px solid ${primaryColor}; color: ${primaryColor}; background: transparent; }
-.jy-input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid #6B7385; background: #FFFFFF; color: ${primaryColor}; font-family: inherit; }
-.jy-split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
-.jy-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.jy-faq summary { cursor: pointer; font-weight: 600; font-size: 17.5px; padding: 16px 0; list-style-position: outside; }
-@container (max-width: 820px) {
-  .jy-split, .jy-two { grid-template-columns: 1fr; gap: 24px; }
-  .jy-wb-inner { padding: 56px 20px !important; }
-}
-`
-    const label: React.CSSProperties = { display: "block", fontSize: 14.5, fontWeight: 600, marginBottom: 6 }
-    const h2: React.CSSProperties = { margin: 0, fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 38, lineHeight: 1.15 }
+    const filteredPlaybook = PLAYBOOK_ITEMS.filter(
+        (p) => (filterLevel === "ALL" || p.level === filterLevel) && (filterUseCase === "ALL" || p.useCase === filterUseCase)
+    )
 
     return (
-        <div className="jy-wb" style={{ ...style, width: "100%", color: primaryColor, fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
-            <style>{css}</style>
-
-            {showBuilds && (
-                <section id="workflows" aria-labelledby="jy-wb-title" style={{ background: "#FFFFFF" }}>
-                    <div className="jy-wb-inner jy-split" style={{ maxWidth: 1080, margin: "0 auto", padding: "80px 24px", boxSizing: "border-box" }}>
-                        <div>
-                            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: accentDark }}>For companies and organisations</p>
-                            <h2 id="jy-wb-title" style={{ ...h2, marginTop: 10 }}>Custom AI workflow builds</h2>
-                            <p style={{ margin: "14px 0 0", fontSize: 18, lineHeight: 1.55, color: "#2B3550" }}>
-                                I design and build AI workflows and assistants around how your team already works. Think an intake assistant that answers the same 30 questions, a weekly report that writes its own first draft, or a flow that turns meeting notes into tasks.
-                            </p>
-                            <ol style={{ margin: "20px 0 0", paddingLeft: 22, fontSize: 16.5, lineHeight: 1.65 }}>
-                                <li>A free 20 minute discovery call about your process.</li>
-                                <li>A fixed quote with the scope, timeline and what you'll get.</li>
-                                <li>I build it in your own accounts, test it with your team and hand it over with a short guide.</li>
-                            </ol>
-                            <p style={{ margin: "18px 0 0", fontSize: 15.5 }}>
-                                Want to know who you'd be working with? <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ color: primaryColor, fontWeight: 600 }}>See my LinkedIn</a>.
-                            </p>
-                            {discoveryCallUrl && (
-                                <a className="jy-btn jy-btn-ghost" href={discoveryCallUrl} style={{ marginTop: 18 }}>Book the 20 minute call</a>
-                            )}
-                        </div>
-                        <div style={{ background: creamColor, borderRadius: 20, padding: 28, border: "1px solid rgba(20,33,61,0.1)" }}>
-                            <h3 id="jy-quote-title" style={{ margin: 0, fontSize: 22 }}>Ask for a quote</h3>
-                            {state === "done" ? (
-                                <p role="status" style={{ margin: "14px 0 0", fontSize: 17, lineHeight: 1.5, fontWeight: 600 }}>
-                                    Thanks, {f.name.trim().split(" ")[0] || "and talk soon"}. I'll reply within 2 working days to set up our 20 minute call.
-                                </p>
-                            ) : (
-                                <form onSubmit={submit} aria-labelledby="jy-quote-title" noValidate style={{ marginTop: 16, display: "grid", gap: 14 }}>
-                                    <div className="jy-two">
-                                        <div>
-                                            <label htmlFor="jy-q-name" style={label}>Name</label>
-                                            <input id="jy-q-name" className="jy-input" autoComplete="name" required value={f.name} onChange={set("name")} />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="jy-q-email" style={label}>Work email</label>
-                                            <input id="jy-q-email" className="jy-input" type="email" autoComplete="email" required value={f.email} onChange={set("email")} />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="jy-q-company" style={label}>Company</label>
-                                            <input id="jy-q-company" className="jy-input" autoComplete="organization" required value={f.company} onChange={set("company")} />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="jy-q-team" style={label}>Team size</label>
-                                            <select id="jy-q-team" className="jy-input" required value={f.teamSize} onChange={set("teamSize")}>
-                                                <option value="">Choose one</option>
-                                                <option>1 to 5</option>
-                                                <option>6 to 20</option>
-                                                <option>21 to 50</option>
-                                                <option>51 to 200</option>
-                                                <option>200+</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="jy-q-desc" style={label}>Workflow description</label>
-                                        <textarea id="jy-q-desc" className="jy-input" rows={5} required value={f.description} onChange={set("description")} aria-describedby="jy-q-desc-hint" />
-                                        <span id="jy-q-desc-hint" style={{ fontSize: 13.5, color: "#4A5468" }}>What happens today, who does it, and what would "done" look like?</span>
-                                    </div>
-                                    {err && <p role="alert" style={{ margin: 0, color: "#A1260F", fontWeight: 600 }}>{err}</p>}
-                                    {state === "error" && <p role="alert" style={{ margin: 0, color: "#A1260F", fontWeight: 600 }}>Sorry, that didn't go through. Please try again in a moment.</p>}
-                                    <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-                                        <button type="submit" className="jy-btn jy-btn-primary" disabled={state === "sending"}>{state === "sending" ? "Sending..." : state === "error" ? "Try again" : "Send my request"}</button>
-                                        <span style={{ fontSize: 13.5, color: "#4A5468" }}>Used only to reply to you. <a href={privacyUrl} style={{ color: primaryColor }}>Privacy policy</a>.</span>
-                                    </div>
-                                </form>
-                            )}
-                        </div>
+        <div style={{ fontFamily: "Inter, -apple-system, sans-serif", color: "#1D2432" }}>
+            {showWorkflows && (
+            <section id="workflows" style={{ background: "#FAF8F5", padding: "72px 20px" }}>
+                <div
+                    style={{
+                        maxWidth: 1120,
+                        margin: "0 auto",
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                        gap: 36,
+                        alignItems: "start",
+                    }}
+                >
+                    <div>
+                        <span style={{ background: "#FDF0E6", color: accentAA, fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 6 }}>
+                            DONE-FOR-YOU BUILDS
+                        </span>
+                        <h2 style={{ fontSize: 32, color: primaryColor, margin: "12px 0 16px" }}>
+                            I'll build custom AI workflows for your organization or company
+                        </h2>
+                        <p style={{ fontSize: 17, lineHeight: 1.6, color: "#4A5568" }}>
+                            Stop paying for AI tools that sit unused. Tell me where your team loses hours every week, and I'll design, build, and test a working AI workflow tailored to your exact process.
+                        </p>
+                        <ul style={{ paddingLeft: 20, lineHeight: 1.7, margin: "20px 0" }}>
+                            <li>
+                                <strong>Customer & Client Operations:</strong> Turn raw call notes, emails, or intake forms into clean summaries and follow-up drafts.
+                            </li>
+                            <li>
+                                <strong>Internal Knowledge Assistants:</strong> Custom assistants grounded in your company SOPs and documents so staff get instant answers.
+                            </li>
+                            <li>
+                                <strong>Weekly Reporting & Research:</strong> Automate repetitive data cleanup and weekly status updates.
+                            </li>
+                        </ul>
+                        <p style={{ fontSize: 15, color: "#4A5568" }}>
+                            Want to review my background first?{" "}
+                            <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ color: primaryColor, fontWeight: 600 }}>
+                                View my profile on LinkedIn ↗
+                            </a>
+                        </p>
                     </div>
-                </section>
+
+                    <div style={{ background: "#FFFFFF", border: "1px solid #E2DFD9", borderRadius: 12, padding: 28 }}>
+                        {b2bSent ? (
+                            <div role="status">
+                                <h3 style={{ color: primaryColor, margin: "0 0 10px" }}>Thanks for reaching out!</h3>
+                                <p style={{ lineHeight: 1.6, margin: 0 }}>
+                                    I've received your details for <strong>{b2bCompany}</strong> and will reply within one business day to schedule our 20-minute discovery call and put together your quote.
+                                </p>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleB2bSubmit} aria-label="Request a discovery call and quote">
+                                <h3 style={{ fontSize: 22, color: primaryColor, margin: "0 0 8px" }}>
+                                    Contact me for a discovery call and quote
+                                </h3>
+                                <p style={{ fontSize: 15, color: "#4A5568", marginBottom: 18 }}>
+                                    I reply within one business day to set up a 20-minute discovery call.
+                                </p>
+                                <input
+                                    type="text"
+                                    required
+                                    aria-label="Full name"
+                                    autoComplete="name"
+                                    placeholder="Full Name *"
+                                    value={b2bName}
+                                    onChange={(e) => setB2bName(e.target.value)}
+                                    style={{ width: "100%", padding: 11, borderRadius: 6, border: "1px solid #8A857C", marginBottom: 12, fontSize: 15 }}
+                                />
+                                <input
+                                    type="email"
+                                    required
+                                    aria-label="Work email"
+                                    autoComplete="email"
+                                    placeholder="Work Email *"
+                                    value={b2bEmail}
+                                    onChange={(e) => setB2bEmail(e.target.value)}
+                                    style={{ width: "100%", padding: 11, borderRadius: 6, border: "1px solid #8A857C", marginBottom: 12, fontSize: 15 }}
+                                />
+                                <input
+                                    type="text"
+                                    required
+                                    aria-label="Company or organization name"
+                                    autoComplete="organization"
+                                    placeholder="Company or Organization Name *"
+                                    value={b2bCompany}
+                                    onChange={(e) => setB2bCompany(e.target.value)}
+                                    style={{ width: "100%", padding: 11, borderRadius: 6, border: "1px solid #8A857C", marginBottom: 12, fontSize: 15 }}
+                                />
+                                <select
+                                    value={b2bSize}
+                                    onChange={(e) => setB2bSize(e.target.value)}
+                                    aria-label="Team Size"
+                                    style={{ width: "100%", padding: 11, borderRadius: 6, border: "1px solid #8A857C", marginBottom: 12, fontSize: 15 }}
+                                >
+                                    <option value="1-10">Team Size: 1 to 10 people</option>
+                                    <option value="11-50">Team Size: 11 to 50 people</option>
+                                    <option value="51-200">Team Size: 51 to 200 people</option>
+                                    <option value="200+">Team Size: 200+ people</option>
+                                </select>
+                                <textarea
+                                    rows={3}
+                                    required
+                                    aria-label="What workflow or repetitive task would you like me to build?"
+                                    placeholder="What workflow or repetitive task would you like me to build? *"
+                                    value={b2bTask}
+                                    onChange={(e) => setB2bTask(e.target.value)}
+                                    style={{ width: "100%", padding: 11, borderRadius: 6, border: "1px solid #8A857C", marginBottom: 12, fontSize: 15 }}
+                                />
+                                <label style={{ display: "flex", gap: 10, fontSize: 14, color: "#4A5568", marginBottom: 16 }}>
+                                    <input type="checkbox" aria-label="Send me occasional practical AI workflow ideas for companies" checked={b2bConsent} onChange={(e) => setB2bConsent(e.target.checked)} style={{ marginTop: 3 }} />
+                                    <span>Send me occasional practical AI workflow ideas for companies.</span>
+                                </label>
+                                {b2bError && (
+                                    <p role="alert" style={{ color: "#9B1C1C", fontSize: 14, margin: "0 0 12px" }}>{b2bError}</p>
+                                )}
+                                <button
+                                    type="submit"
+                                    disabled={b2bSending}
+                                    style={{
+                                        width: "100%",
+                                        background: accentAA,
+                                        color: "#FFFFFF",
+                                        padding: 13,
+                                        border: "none",
+                                        borderRadius: 8,
+                                        fontWeight: 600,
+                                        fontSize: 16,
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    {b2bSending ? "Sending..." : b2bError ? "Try Again" : "Request Discovery Call & Quote"}
+                                </button>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            </section>
             )}
 
             {showAbout && (
-                <section id="about" aria-labelledby="jy-about-title" style={{ background: creamColor }}>
-                    <div className="jy-wb-inner" style={{ maxWidth: 820, margin: "0 auto", padding: "80px 24px", boxSizing: "border-box" }}>
-                        <h2 id="jy-about-title" style={h2}>Hi, I'm Jordana</h2>
-                        <p style={{ margin: "16px 0 0", fontSize: 18, lineHeight: 1.65, color: "#2B3550" }}>{aboutBody}</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 24 }}>
-                            <a className="jy-btn jy-btn-primary" href="/#quiz">Check your AI level</a>
-                            <a className="jy-btn jy-btn-ghost" href={linkedinUrl} target="_blank" rel="noopener noreferrer">Connect on LinkedIn</a>
-                        </div>
+            <section id="about" style={{ background: "#FFFFFF", padding: "72px 20px" }}>
+                <div style={{ maxWidth: 800, margin: "0 auto" }}>
+                    <h2 style={{ fontSize: 32, color: primaryColor, margin: "0 0 18px" }}>
+                        Why learn from someone who builds AI tools for real people?
+                    </h2>
+                    <p style={{ fontSize: 17, lineHeight: 1.7, color: "#1D2432" }}>
+                        Most AI training is taught by engineers who love showing off complicated features, or marketers selling hype. I focus on what actually works for busy people.
+                    </p>
+                    <p style={{ fontSize: 17, lineHeight: 1.7, color: "#1D2432" }}>
+                        For more than 20 years, I have helped shape digital products and customer experiences at companies like Microsoft and Meta, as well as HoneyBook and SodaStream. Today, I am part of the Microsoft team building Copilot Studio, Microsoft's AI agent builder, where I see firsthand what makes AI genuinely useful and where people get stuck.
+                    </p>
+                    <p style={{ fontSize: 17, lineHeight: 1.7, color: "#1D2432", marginBottom: 28 }}>
+                        You do not need to learn how to code or memorize technical terms. Whether I am teaching you in a live session or building a custom workflow for your company, my goal is simple: give you practical tools that save real hours every week.
+                    </p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
+                        <a
+                            href={quizUrl}
+                            style={{
+                                background: accentAA,
+                                color: "#FFFFFF",
+                                padding: "13px 24px",
+                                borderRadius: 8,
+                                fontWeight: 600,
+                                textDecoration: "none",
+                            }}
+                        >
+                            See which level fits you best
+                        </a>
+                        <a
+                            href={linkedinUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                background: "#FFFFFF",
+                                color: primaryColor,
+                                border: `2px solid ${primaryColor}`,
+                                padding: "11px 22px",
+                                borderRadius: 8,
+                                fontWeight: 600,
+                                textDecoration: "none",
+                            }}
+                        >
+                            View my background on LinkedIn ↗
+                        </a>
                     </div>
-                </section>
+                </div>
+            </section>
+            )}
+
+            {showLibrary && (
+            <section id="library" style={{ background: "#FAF8F5", padding: "72px 20px" }}>
+                <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+                    <div style={{ maxWidth: 680, marginBottom: 28 }}>
+                        <h2 style={{ fontSize: 32, color: primaryColor, margin: "0 0 10px" }}>The Practical AI Playbook</h2>
+                        <p style={{ fontSize: 17, color: "#4A5568", margin: 0 }}>
+                            Bite-sized guides and tested templates organized by skill level and everyday use case.
+                        </p>
+                    </div>
+
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
+                        <select
+                            value={filterLevel}
+                            onChange={(e) => setFilterLevel(e.target.value)}
+                            aria-label="Filter by skill level"
+                            style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid #8A857C", fontSize: 15 }}
+                        >
+                            <option value="ALL">All Levels</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                        </select>
+                        <select
+                            value={filterUseCase}
+                            onChange={(e) => setFilterUseCase(e.target.value)}
+                            aria-label="Filter by topic"
+                            style={{ padding: "10px 14px", borderRadius: 8, border: "1px solid #8A857C", fontSize: 15 }}
+                        >
+                            <option value="ALL">All Topics</option>
+                            <option value="Work Productivity">Work Productivity</option>
+                            <option value="Writing">Writing</option>
+                            <option value="Research">Research</option>
+                            <option value="AI at Home">AI at Home</option>
+                        </select>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+                        {filteredPlaybook.map((item, idx) => (
+                            <div key={idx} style={{ background: "#FFFFFF", border: "1px solid #E2DFD9", borderRadius: 10, padding: 24 }}>
+                                <span style={{ background: "#FDF0E6", color: accentAA, fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 6 }}>
+                                    {item.level} &bull; {item.useCase}
+                                </span>
+                                <h3 style={{ fontSize: 19, color: primaryColor, margin: "12px 0 8px" }}>{item.title}</h3>
+                                <p style={{ fontSize: 15, color: "#4A5568", lineHeight: 1.6, margin: 0 }}>{item.summary}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div style={{ marginTop: 28 }}>
+                        <a href={quizUrl} style={{ color: primaryColor, fontWeight: 700, fontSize: 17 }}>
+                            Want live feedback while you build these habits? Find your level &rarr;
+                        </a>
+                    </div>
+                </div>
+            </section>
             )}
 
             {showFaq && (
-                <section id="faq" aria-labelledby="jy-faq-title" style={{ background: "#FFFFFF" }}>
-                    <div className="jy-wb-inner" style={{ maxWidth: 820, margin: "0 auto", padding: "80px 24px", boxSizing: "border-box" }}>
-                        <h2 id="jy-faq-title" style={h2}>Questions people ask</h2>
-                        <div className="jy-faq" style={{ marginTop: 18 }}>
-                            {(faqs && faqs.length ? faqs : DEFAULT_FAQS).map((item) => (
-                                <details key={item.q} style={{ borderBottom: "1px solid rgba(20,33,61,0.15)" }}>
+                <section id="faq" aria-labelledby="jy-faq-title" style={{ background: showLibrary ? "#FFFFFF" : "#FAF8F5", padding: "72px 20px" }}>
+                    <style>{`
+.jy-faq-item summary { cursor: pointer; font-weight: 600; font-size: 17px; padding: 16px 0; color: ${primaryColor}; }
+.jy-faq-item summary:focus-visible { outline: 3px solid ${accentColor}; outline-offset: 3px; }
+`}</style>
+                    <div style={{ maxWidth: 820, margin: "0 auto" }}>
+                        <h2 id="jy-faq-title" style={{ fontSize: 32, color: primaryColor, margin: "0 0 18px" }}>Questions people ask</h2>
+                        <div>
+                            {FAQS.map((item) => (
+                                <details key={item.q} className="jy-faq-item" style={{ borderBottom: "1px solid #E2DFD9" }}>
                                     <summary>{item.q}</summary>
-                                    <p style={{ margin: "0 0 18px", fontSize: 16.5, lineHeight: 1.6, color: "#2B3550" }}>{item.a}</p>
+                                    <p style={{ margin: "0 0 18px", fontSize: 16, lineHeight: 1.6, color: "#4A5568" }}>{item.a}</p>
                                 </details>
                             ))}
                         </div>
-                        <p style={{ margin: "24px 0 0", fontSize: 16.5 }}>
-                            Still wondering? <a href="/#quiz" style={{ color: primaryColor, fontWeight: 700 }}>Start with the 3 minute level check</a>, it answers most of them.
-                        </p>
+                        <div style={{ marginTop: 28 }}>
+                            <a href={quizUrl} style={{ color: primaryColor, fontWeight: 700, fontSize: 17 }}>
+                                Still not sure where to start? Take the 2-Minute AI Level Check &rarr;
+                            </a>
+                        </div>
                     </div>
                 </section>
             )}
@@ -231,21 +405,13 @@ export default function WorkflowBuildsAndAbout(props: Props) {
 }
 
 addPropertyControls(WorkflowBuildsAndAbout, {
-    webhookUrl: { type: ControlType.String, title: "Webhook URL", defaultValue: "", placeholder: "Paste the n8n webhook URL" },
-    discoveryCallUrl: { type: ControlType.String, title: "Discovery call URL", defaultValue: "", placeholder: "Cal.com or Calendly link" },
-    linkedinUrl: { type: ControlType.String, title: "LinkedIn", defaultValue: "https://www.linkedin.com/in/jordana-young" },
-    showBuilds: { type: ControlType.Boolean, title: "Builds", defaultValue: true },
+    primaryColor: { type: ControlType.Color, title: "Primary Navy", defaultValue: "#14213D" },
+    accentColor: { type: ControlType.Color, title: "Accent Amber", defaultValue: "#C86D2D" },
+    linkedinUrl: { type: ControlType.String, title: "LinkedIn URL", defaultValue: "https://www.linkedin.com/in/jordana-young" },
+    webhookUrl: { type: ControlType.String, title: "n8n Webhook URL", defaultValue: "" },
+    quizUrl: { type: ControlType.String, title: "Quiz Anchor or URL", defaultValue: "#quiz" },
+    showWorkflows: { type: ControlType.Boolean, title: "Workflow Builds", defaultValue: true },
     showAbout: { type: ControlType.Boolean, title: "About", defaultValue: true },
+    showLibrary: { type: ControlType.Boolean, title: "Built-in Playbook", description: "Turn off where the CMS Playbook list sits on the canvas.", defaultValue: true },
     showFaq: { type: ControlType.Boolean, title: "FAQ", defaultValue: true },
-    aboutBody: { type: ControlType.String, title: "About text", displayTextArea: true, defaultValue: DEFAULT_ABOUT },
-    faqs: {
-        type: ControlType.Array,
-        title: "FAQ",
-        control: { type: ControlType.Object, controls: { q: { type: ControlType.String, title: "Question" }, a: { type: ControlType.String, title: "Answer", displayTextArea: true } } },
-        defaultValue: DEFAULT_FAQS,
-    },
-    privacyUrl: { type: ControlType.String, title: "Privacy URL", defaultValue: "/privacy" },
-    primaryColor: { type: ControlType.Color, title: "Primary", defaultValue: "#14213D" },
-    accentColor: { type: ControlType.Color, title: "Accent", defaultValue: "#C86D2D" },
-    creamColor: { type: ControlType.Color, title: "Cream", defaultValue: "#FAF8F5" },
 })

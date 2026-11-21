@@ -9,54 +9,58 @@ This folder holds the source for the Framer version of the site, so it can be re
 
 | Path | What it is |
 |---|---|
-| `components/*.tsx` | The 7 Framer code components, exactly as they are in the project |
-| `cms/cohorts.json` | Seed rows for the **Cohorts** collection (3 December runs, plus hidden Advanced and Expert rows) |
-| `cms/playbook.json` | Seed rows for the **Playbook** collection (one starter guide per use case) |
+| `original/*.tsx` | Jordana's 7 components exactly as she wrote them |
+| `components/*.tsx` | The same 7 components with the fixes listed below. This is what runs in the Framer project |
+| `cms/cohorts.json` | **Cohorts** collection rows (3 December runs, plus hidden Advanced and Expert rows), copy aligned with `../docs/curricula-prep-playbook.md` |
+| `cms/playbook.json` | **Playbook** collection rows: the 6 starter modules from the curricula doc |
 | `cms/reviews.json` | **Reviews** collection fields. Empty on purpose: add real reviews only |
 | `pages/site-map.md` | Every page, its sections and anchors, in order |
 | `pages/privacy.md`, `pages/terms.md` | Legal page copy (drafts for an Israeli lawyer to review) |
 
-## Rebuild from scratch
+## Changes made to Jordana's components
 
-1. Create a new Framer project. Add a **Site Layout** layout template: a vertical stack with gap 0 and cream fill (`#FAF8F5`), with `SiteHeader` on top (position sticky, top 0), the page placeholder, then `SiteFooterAndLegal`.
-2. In Assets > Code, create one file per component in `components/` with the same file name and paste the source.
-3. Create the CMS collections with these fields:
-   - **Cohorts**: Title (text), Slug, Level (option: Beginner, Intermediate, Advanced, Expert), Day (text), Schedule Details (text), Price (number, 600), Seats Remaining (number, 15), Status (option: Waitlist, Open, Full), Visible (toggle), Promise (text), Payment Link (link).
-   - **Playbook**: Title, Slug, Level (option), Use Case (option: Work Productivity, Writing, Research, Images, Agents & Automation, AI at Home), Summary, Prompt Template, Read Time (number).
-   - **Reviews**: Student Name, Slug, Role, Quote, Approved (toggle, off by default).
-   Then import the rows from `cms/`.
-4. Build the pages listed in `pages/site-map.md`. Every page uses the Site Layout template and has a Desktop (1200px) and Phone (390px) breakpoint.
+Her copy and design are kept. Only these changes were made:
+
+- **All components:** amber stays `#C86D2D` for borders, bars and lines. Where amber sat behind white text or was used as small text on light backgrounds it failed WCAG AA (about 3.7:1), so those spots use a darker shade of the same amber (`#965222`, 5.9:1 with white). Input borders went from `#B8B4AC` to `#8A857C` so the field edges reach 3:1. `@framerSupportedLayoutWidth/Height` annotations added so instances can stretch to the page width.
+- **SiteHeader:** below 768px the Menu button shows and the nav collapses; the open menu stacks the links, and tapping a link closes it. Links point at `/#section` (and `/playbook#library`) so they work from every page.
+- **HeroAndOutcomes:** adds the core promise line, "Every engagement moves you a couple of steps further so you feel you got clear value for your money." (editable Core Promise property). Tabs get tab and tabpanel wiring for screen readers.
+- **OfferingsAndCohorts:** new switches (Ways to Work, Cohorts Heading, Built-in Cohort Cards, Waitlist Form) so Home and /cohorts can show the CMS cohort cards on the canvas between her heading and her waitlist form. When her built-in cards are off, the waitlist form stays open with a "Which group?" picker. Fields have labels for screen readers, success shows only when the webhook answers OK (or no webhook is set), otherwise a "try again" message. Consent stays unchecked.
+- **ScarcityTierWidget:** her tiers (400 / 600 / 750 / 950 / 1,200 ILS, 8 slots each) are unchanged. The hours line now also lists the breaks (12:00 to 12:30 every day, Mondays 16:30 to 18:30).
+- **AILevelQuiz:** "unlock" in the lead form copy became "see". Results show seat counts from new properties (Beginner Seats Left, Intermediate Seats Left, Seats per Group). Advanced and Expert results also get a "Join the priority waitlist for the 2027 cohort" link. The lead form saves before showing results; if the webhook fails, answers are kept and a retry message shows. New Section ID property (cleared where a canvas section already carries `#quiz`) and a Canvas Preview property for checking the results screens (keep it on "Live quiz").
+- **WorkflowBuildsAndAbout:** switches for each part (Workflow Builds, About, Built-in Playbook, FAQ). Adds an FAQ section (6 questions, built from facts already on the site) ending with a link to the level check. The quote form gets labels for screen readers and the same success/retry handling. `&nearr;` showed as raw text in Framer, so it's now the ↗ character.
+- **SiteFooterAndLegal:** links point at `/#section` so they work from every page; the legal panels link to the full /privacy and /terms pages; the toggles report open/closed state; `&nearr;` fixed as above.
+
+## Home order
+
+SiteHeader (layout template), HeroAndOutcomes, OfferingsAndCohorts (ways to work and the `#cohorts` heading), CMS cohort cards, OfferingsAndCohorts (waitlist form), ScarcityTierWidget (`#coaching`), canvas section `#quiz` with AILevelQuiz, WorkflowBuildsAndAbout (`#workflows`, `#about`), CMS Playbook (`#library`), WorkflowBuildsAndAbout (`#faq`), Reviews strip (CMS, Approved only, empty until real reviews exist), SiteFooterAndLegal (layout template).
 
 ## Things to paste in before publishing
 
 | Where | Property | What to paste |
 |---|---|---|
-| `AILevelQuiz` (Home and /assessment) | Webhook URL | n8n production webhook for `POST /jordana-ops-agent` |
-| `OfferingsAndCohorts` (both waitlist instances, Home and /cohorts) | Webhook URL | same n8n webhook |
-| `WorkflowBuildsAndAbout` (Home, /company-builds) | Webhook URL | same n8n webhook |
-| `WorkflowBuildsAndAbout` | Discovery call URL | Cal.com or Calendly link for the 20 minute call (optional) |
-| `ScarcityTierWidget` (Home, /coaching) | Booking URL, Pay link ₪400 to ₪1,200 | PayPlus, Grow or Cardcom payment pages, or the booking link |
-| `ScarcityTierWidget` | Booked count or Count JSON URL | live number of 1:1 sessions sold (JSON shape `{"bookedCount": 0}`) |
-| `AILevelQuiz` | Starter pay URL, Work pay URL, seats, status | cohort payment pages once dates are set |
+| `AILevelQuiz`, `OfferingsAndCohorts`, `WorkflowBuildsAndAbout` (every instance) | n8n Webhook URL | the n8n production URL for `POST /jordana-ops-agent` (see `../n8n/README.md`) |
+| `ScarcityTierWidget` (Home, /coaching) | Booking URL | booking or payment page (default `#book-calendar` is a placeholder) |
+| `ScarcityTierWidget` | Booked Count or Live Inventory URL | number of 1:1 sessions sold so far, or a JSON URL |
+| `AILevelQuiz` | Beginner / Intermediate Seats Left | seats left per group |
 | CMS **Cohorts** | Payment Link, Seats Remaining, Status, Schedule Details | per run, once dates and payment pages exist |
-| `SiteFooterAndLegal` | Contact email | public email address |
+| `SiteFooterAndLegal` | Contact Email | public email address (default is her Gmail) |
 
-Every webhook property is empty by default. While it's empty the forms still show their success message, so the site can be previewed safely.
+Every webhook property is empty for now. While it's empty the forms show their success message, so the site can be previewed safely.
 
-## Webhook payloads
+## Webhook payloads (her field names)
 
-All forms send `POST` with a JSON body and `Content-Type: application/json`.
+All forms `POST` JSON with `Content-Type: application/json`, keyed by `event_type`:
 
-- `quiz_lead`: firstName, email, marketingConsent, score, level, rawLevel, capRuleApplied, bumpRuleApplied, answers[] (question, answer, points), q11, track, submittedAt, timezone, page
-- `waitlist_join`: firstName, email, cohort, level, marketingConsent, submittedAt, timezone, page
-- `b2b_quote`: name, workEmail, company, teamSize, workflowDescription, submittedAt, timezone, page
+- `quiz_lead`: name, email, level, score, q11, q12, marketingConsent
+- `waitlist_join`: name, email, cohort, marketingConsent
+- `b2b_quote`: name, email, company, teamSize, taskDescription, marketingConsent
 
-The waitlist and quote forms only show success when the POST returns 2xx (or when no webhook is set). Otherwise they show a friendly "please try again" message.
+`payment_confirmed` comes from the payment gateway into n8n, not from the site.
 
-## Scoring (AILevelQuiz)
+## Scoring (her AILevelQuiz)
 
-Q1 to Q10 score 0, 1, 2, 3 in the order listed (max 30). 0 to 7 Beginner, 8 to 15 Intermediate, 16 to 23 Advanced, 24 to 30 Expert. "I haven't tried it yet." on Q1 caps the result at Beginner. "Agents and automation" on Q12 with a score of 12 or more moves the result up one level. The **Preview** property shows any results screen on the canvas. Set it back to **Live** before publishing.
+Q1 to Q10 add up to a score out of 30: 0 to 7 Beginner, 8 to 15 Intermediate, 16 to 23 Advanced, 24 or more Expert. "Agents and automation" on Q12 with 12 or more moves the result up one level. The Q1 "haven't tried it" answer caps the result at Beginner, and the cap wins over the bump.
 
 ## Brand rules the copy follows
 
-English only, prices in ILS (₪), times in Israel time. No em dashes or en dashes. None of the banned buzzwords. Never the titles "Senior Researcher" or "User Researcher". No LetsGo badge. The Microsoft independence disclaimer is in the footer and the Terms. Advanced and Expert cohorts stay hidden (Visible off) until Q1 2027.
+English only, prices in ILS, times in Israel time. No em dashes or en dashes. None of the banned buzzwords. Never the titles "Senior Researcher" or "User Researcher". No LetsGo badge. The Microsoft independence disclaimer is in the footer. Advanced and Expert cohorts stay hidden (Visible off) until Q1 2027.

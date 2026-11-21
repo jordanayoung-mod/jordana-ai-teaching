@@ -1,231 +1,199 @@
 import * as React from "react"
+import { useState, useEffect } from "react"
 import { addPropertyControls, ControlType } from "framer"
 
-/**
- * ScarcityTierWidget: live counter for the 40-session 1:1 coaching release.
- * 5 tiers x 8 slots, sold in order: 400 / 600 / 750 / 950 / 1,200 ILS.
- * Booked count comes from the "Booked count" control, or from a JSON URL that
- * returns { "bookedCount": 12 } (the JSON value wins when it loads).
- *
- * @framerSupportedLayoutWidth any-prefer-fixed
- * @framerSupportedLayoutHeight auto
- */
-
-interface Props {
-    primaryColor: string
-    accentColor: string
-    creamColor: string
-    title: string
-    intro: string
-    bookedCount: number
-    jsonUrl: string
-    tierPrices: number[]
-    slotsPerTier: number
-    bookingUrl: string
-    payment1: string
-    payment2: string
-    payment3: string
-    payment4: string
-    payment5: string
-    showHours: boolean
-    opensLabel: string
-    style?: React.CSSProperties
-}
-
-const HOURS = [
-    { day: "Sunday", open: "11:00 to 20:00", breaks: "12:00 to 12:30 lunch" },
-    { day: "Monday", open: "11:00 to 20:00", breaks: "12:00 to 12:30 lunch, and 16:30 to 18:30" },
-    { day: "Tuesday", open: "11:00 to 20:00", breaks: "12:00 to 12:30 lunch" },
-    { day: "Wednesday", open: "11:00 to 20:00", breaks: "12:00 to 12:30 lunch" },
-    { day: "Thursday", open: "11:00 to 20:00", breaks: "12:00 to 12:30 lunch" },
-]
-
+// WCAG AA: a darker shade of the accent for text and for backgrounds behind white text.
 function shade(hex: string, factor: number) {
-    const h = hex.replace("#", "")
+    const h = (hex || "").replace("#", "")
     if (h.length !== 6) return hex
     const n = [0, 2, 4].map((i) => Math.round(parseInt(h.slice(i, i + 2), 16) * factor))
     return "#" + n.map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("")
 }
 
-export default function ScarcityTierWidget(props: Props) {
-    const {
-        primaryColor = "#14213D",
-        accentColor = "#C86D2D",
-        creamColor = "#FAF8F5",
-        title = "Private 1:1 coaching",
-        intro = "One focused session on your own tasks, tools and questions. This round has 40 sessions in total, sold in order. Every 8 sessions the price steps up, so the earlier you book, the less you pay.",
-        bookedCount = 0,
-        jsonUrl = "",
-        tierPrices = [400, 600, 750, 950, 1200],
-        slotsPerTier = 8,
-        bookingUrl = "",
-        payment1 = "",
-        payment2 = "",
-        payment3 = "",
-        payment4 = "",
-        payment5 = "",
-        showHours = true,
-        opensLabel = "Bookings open the week of Sunday 29 November 2026.",
-        style,
-    } = props
-    const [remoteCount, setRemoteCount] = React.useState<number | null>(null)
-    const accentDark = shade(accentColor, 0.84)
+const TIERS = [
+    { tier: 1, price: 400, slots: 8, label: "Sessions 1 to 8" },
+    { tier: 2, price: 600, slots: 8, label: "Sessions 9 to 16" },
+    { tier: 3, price: 750, slots: 8, label: "Sessions 17 to 24" },
+    { tier: 4, price: 950, slots: 8, label: "Sessions 25 to 32" },
+    { tier: 5, price: 1200, slots: 8, label: "Sessions 33 to 40" },
+]
 
-    React.useEffect(() => {
-        if (!jsonUrl) return
-        let cancelled = false
-        fetch(jsonUrl, { cache: "no-store" })
-            .then((r) => (r.ok ? r.json() : null))
-            .then((d) => {
-                const n = d && Number(d.bookedCount)
-                if (!cancelled && Number.isFinite(n)) setRemoteCount(n)
+/**
+ * @framerSupportedLayoutWidth any-prefer-fixed
+ * @framerSupportedLayoutHeight auto
+ */
+export default function ScarcityTierWidget(props) {
+    const { bookedCountProp, liveInventoryUrl, bookingUrl, primaryColor, accentColor } = props
+    const accentAA = shade(accentColor, 0.75)
+    const [bookedCount, setBookedCount] = useState<number>(bookedCountProp)
+
+    useEffect(() => {
+        setBookedCount(bookedCountProp)
+    }, [bookedCountProp])
+
+    useEffect(() => {
+        if (!liveInventoryUrl) return
+        fetch(liveInventoryUrl)
+            .then((r) => r.json())
+            .then((data) => {
+                if (typeof data.bookedCount === "number") {
+                    setBookedCount(data.bookedCount)
+                }
             })
             .catch(() => {})
-        return () => {
-            cancelled = true
+    }, [liveInventoryUrl])
+
+    const getActiveTier = () => {
+        let cumulative = 0
+        for (const t of TIERS) {
+            if (bookedCount < cumulative + t.slots) {
+                const remaining = cumulative + t.slots - bookedCount
+                const nextTier = TIERS.find((x) => x.tier === t.tier + 1)
+                return { ...t, remaining, nextPrice: nextTier ? nextTier.price : null }
+            }
+            cumulative += t.slots
         }
-    }, [jsonUrl])
+        return null
+    }
 
-    const prices = tierPrices && tierPrices.length ? tierPrices : [400, 600, 750, 950, 1200]
-    const total = prices.length * slotsPerTier
-    const booked = Math.max(0, Math.min(total, Math.round(remoteCount ?? bookedCount ?? 0)))
-    const currentTier = Math.min(prices.length - 1, Math.floor(booked / slotsPerTier))
-    const soldOut = booked >= total
-    const payments = [payment1, payment2, payment3, payment4, payment5]
-    const ctaUrl = payments[currentTier] || bookingUrl
-    const leftInTier = soldOut ? 0 : slotsPerTier - (booked % slotsPerTier)
-
-    const css = `
-.jy-tw { container-type: inline-size; }
-.jy-tw a:focus-visible { outline: 3px solid ${accentColor}; outline-offset: 3px; }
-.jy-tiers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-.jy-btn { display: inline-block; text-decoration: none; font-weight: 600; font-size: 16px; padding: 14px 22px; border-radius: 999px; }
-.jy-btn-primary { background: ${accentDark}; color: #FFFFFF; }
-.jy-btn-primary:hover { background: ${primaryColor}; }
-@container (max-width: 820px) {
-  .jy-tiers { grid-template-columns: 1fr; }
-  .jy-tw-inner { padding: 56px 20px !important; }
-}
-`
-    const th: React.CSSProperties = { textAlign: "left", padding: "10px 12px", borderBottom: "1px solid rgba(20,33,61,0.15)", fontSize: 14.5 }
-    const td: React.CSSProperties = { padding: "10px 12px", borderBottom: "1px solid rgba(20,33,61,0.08)", fontSize: 15 }
+    const active = getActiveTier()
 
     return (
-        <div className="jy-tw" style={{ ...style, width: "100%", background: creamColor, color: primaryColor, fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
-            <style>{css}</style>
-            <div className="jy-tw-inner" style={{ maxWidth: 1080, margin: "0 auto", padding: "80px 24px", boxSizing: "border-box" }}>
-                <h2 style={{ margin: 0, fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 38 }}>{title}</h2>
-                <p style={{ margin: "14px 0 0", fontSize: 18, lineHeight: 1.55, maxWidth: 720, color: "#2B3550" }}>{intro}</p>
+        <section id="coaching" style={{ background: "#FFFFFF", padding: "72px 20px", fontFamily: "Inter, -apple-system, sans-serif", color: "#1D2432" }}>
+            <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+                <div style={{ maxWidth: 680, marginBottom: 32 }}>
+                    <h2 style={{ fontSize: 32, color: primaryColor, margin: "0 0 12px" }}>Private 1:1 AI Coaching</h2>
+                    <p style={{ fontSize: 17, color: "#4A5568", margin: 0 }}>
+                        Bookings open the week of Sunday, November 29, 2026. Available Sunday to Thursday, 11:00 to 20:00 Israel Time (lunch break 12:00 to 12:30 every day, and Mondays are also closed 16:30 to 18:30).
+                    </p>
+                </div>
 
-                <p aria-live="polite" style={{ margin: "24px 0 0", fontSize: 17, fontWeight: 700 }}>
-                    {soldOut
-                        ? "All 40 sessions in this round are booked. Join the waitlist for the next round."
-                        : `${total - booked} of ${total} sessions left. ${leftInTier} left at ₪${prices[currentTier].toLocaleString("en-US")} before the price goes up.`}
-                </p>
-
-                <ol className="jy-tiers" aria-label="Price tiers" style={{ listStyle: "none", padding: 0, margin: "20px 0 0" }}>
-                    {prices.map((p, i) => {
-                        const start = i * slotsPerTier
-                        const bookedHere = Math.max(0, Math.min(slotsPerTier, booked - start))
-                        const done = bookedHere >= slotsPerTier
-                        const isCurrent = i === currentTier && !soldOut
-                        return (
-                            <li
-                                key={i}
-                                aria-current={isCurrent ? "step" : undefined}
-                                style={{
-                                    borderRadius: 14,
-                                    padding: 18,
-                                    background: isCurrent ? primaryColor : "#FFFFFF",
-                                    color: isCurrent ? "#FFFFFF" : primaryColor,
-                                    border: `1.5px solid ${isCurrent ? primaryColor : "rgba(20,33,61,0.15)"}`,
-                                    opacity: done ? 0.7 : 1,
-                                }}
-                            >
-                                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                                    Tier {i + 1} · Sessions {start + 1} to {start + slotsPerTier}
-                                </p>
-                                <p style={{ margin: "8px 0 0", fontSize: 28, fontWeight: 700, textDecoration: done ? "line-through" : "none" }}>
-                                    ₪{p.toLocaleString("en-US")}
-                                </p>
-                                <div aria-hidden="true" style={{ display: "flex", gap: 4, marginTop: 10 }}>
-                                    {Array.from({ length: slotsPerTier }).map((_, s) => (
-                                        <span
-                                            key={s}
-                                            style={{
-                                                flex: 1,
-                                                height: 8,
-                                                borderRadius: 4,
-                                                background: s < bookedHere ? (isCurrent ? "#F3C9A6" : accentColor) : isCurrent ? "rgba(255,255,255,0.3)" : "rgba(20,33,61,0.12)",
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                                <p style={{ margin: "8px 0 0", fontSize: 14 }}>
-                                    {done ? "Fully booked" : `${slotsPerTier - bookedHere} of ${slotsPerTier} left`}
-                                </p>
-                            </li>
-                        )
-                    })}
-                </ol>
-
-                {showHours && (
-                    <div style={{ marginTop: 32 }}>
-                        <h3 style={{ margin: 0, fontSize: 20 }}>When you can book</h3>
-                        <p style={{ margin: "6px 0 12px", fontSize: 16 }}>{opensLabel} Sunday to Thursday, Israel time (IST). Friday and Saturday are closed.</p>
-                        <div style={{ overflowX: "auto" }}>
-                            <table style={{ borderCollapse: "collapse", width: "100%", maxWidth: 640, background: "#FFFFFF", borderRadius: 12 }}>
-                                <caption style={{ position: "absolute", left: -9999 }}>Coaching hours in Israel time</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col" style={th}>Day</th>
-                                        <th scope="col" style={th}>Open</th>
-                                        <th scope="col" style={th}>Breaks (no sessions)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {HOURS.map((h) => (
-                                        <tr key={h.day}>
-                                            <th scope="row" style={{ ...td, textAlign: "left", fontWeight: 600 }}>{h.day}</th>
-                                            <td style={td}>{h.open}</td>
-                                            <td style={td}>{h.breaks}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                        gap: 28,
+                        background: "#FAF8F5",
+                        border: "1px solid #E2DFD9",
+                        borderRadius: 12,
+                        padding: 32,
+                    }}
+                >
+                    <div>
+                        <h3 style={{ fontSize: 22, color: primaryColor, margin: "0 0 10px" }}>
+                            How the 40-session release works
+                        </h3>
+                        <p style={{ color: "#4A5568", lineHeight: 1.6, marginBottom: 20 }}>
+                            Only 40 private 1:1 sessions are available so calendar space stays open for group courses and company builds. Every 8 sessions booked, the price steps up automatically.
+                        </p>
+                        <div style={{ display: "grid", gap: 8 }}>
+                            {TIERS.map((t) => {
+                                const isCurrent = active && active.tier === t.tier
+                                const isSoldOut = !active || t.tier < active.tier
+                                return (
+                                    <div
+                                        key={t.tier}
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            padding: "12px 16px",
+                                            background: "#FFFFFF",
+                                            borderRadius: 8,
+                                            border: isCurrent ? `2px solid ${accentColor}` : "1px solid #E2DFD9",
+                                            fontWeight: isCurrent ? 700 : 400,
+                                            opacity: isSoldOut ? 0.55 : 1,
+                                            textDecoration: isSoldOut ? "line-through" : "none",
+                                        }}
+                                    >
+                                        <span>{t.label}</span>
+                                        <span>
+                                            {t.price} ILS {isCurrent ? `(${active.remaining} of ${t.slots} left)` : isSoldOut ? "(Sold out)" : ""}
+                                        </span>
+                                    </div>
+                                )
+                            })}
                         </div>
                     </div>
-                )}
 
-                <div style={{ marginTop: 32, display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
-                    {ctaUrl && !soldOut ? (
-                        <a className="jy-btn jy-btn-primary" href={ctaUrl}>Book a session at ₪{prices[currentTier].toLocaleString("en-US")}</a>
-                    ) : (
-                        <a className="jy-btn jy-btn-primary" href="/#cohorts">Get notified when booking opens</a>
-                    )}
-                    <a href="/#quiz" style={{ color: primaryColor, fontWeight: 600 }}>Not sure what to focus on? Check your AI level first</a>
+                    <div
+                        style={{
+                            background: "#FFFFFF",
+                            border: "1px solid #E2DFD9",
+                            borderRadius: 12,
+                            padding: 28,
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            textAlign: "center",
+                        }}
+                    >
+                        {active ? (
+                            <>
+                                <span style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", color: accentAA, letterSpacing: "0.05em" }}>
+                                    Current Active Price
+                                </span>
+                                <div style={{ fontSize: 44, fontWeight: 800, color: primaryColor, margin: "8px 0" }}>
+                                    {active.price} ILS
+                                </div>
+                                <p style={{ fontWeight: 600, margin: "0 0 6px" }}>
+                                    {active.remaining} of {active.slots} spots left at this price
+                                </p>
+                                {active.nextPrice && (
+                                    <p style={{ fontSize: 14, color: "#4A5568", margin: "0 0 22px" }}>
+                                        Price moves to {active.nextPrice} ILS once these {active.remaining} spots fill.
+                                    </p>
+                                )}
+                                <a
+                                    href={bookingUrl}
+                                    style={{
+                                        display: "block",
+                                        background: accentAA,
+                                        color: "#FFFFFF",
+                                        padding: "14px 22px",
+                                        borderRadius: 8,
+                                        textDecoration: "none",
+                                        fontWeight: 600,
+                                        fontSize: 16,
+                                    }}
+                                >
+                                    Reserve Your 1:1 Spot
+                                </a>
+                                <p style={{ fontSize: 13, color: "#4A5568", marginTop: 14 }}>
+                                    Pay by Israeli credit card or Bit. Official tax invoice issued automatically.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <h4 style={{ fontSize: 22, color: primaryColor }}>All 40 Sessions Booked</h4>
+                                <p style={{ color: "#4A5568" }}>Join the waitlist or explore our December group courses.</p>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 
 addPropertyControls(ScarcityTierWidget, {
-    bookedCount: { type: ControlType.Number, title: "Booked count", defaultValue: 0, min: 0, max: 40, step: 1, displayStepper: true },
-    jsonUrl: { type: ControlType.String, title: "Count JSON URL", defaultValue: "", placeholder: "https://... returns {\"bookedCount\": 0}" },
-    bookingUrl: { type: ControlType.String, title: "Booking URL", defaultValue: "", placeholder: "Cal.com or Calendly link" },
-    payment1: { type: ControlType.String, title: "Pay link ₪400", defaultValue: "" },
-    payment2: { type: ControlType.String, title: "Pay link ₪600", defaultValue: "" },
-    payment3: { type: ControlType.String, title: "Pay link ₪750", defaultValue: "" },
-    payment4: { type: ControlType.String, title: "Pay link ₪950", defaultValue: "" },
-    payment5: { type: ControlType.String, title: "Pay link ₪1,200", defaultValue: "" },
-    tierPrices: { type: ControlType.Array, title: "Tier prices", control: { type: ControlType.Number, min: 0, max: 10000 }, defaultValue: [400, 600, 750, 950, 1200] },
-    slotsPerTier: { type: ControlType.Number, title: "Slots per tier", defaultValue: 8, min: 1, max: 20, step: 1 },
-    title: { type: ControlType.String, title: "Title", defaultValue: "Private 1:1 coaching" },
-    intro: { type: ControlType.String, title: "Intro", displayTextArea: true, defaultValue: "One focused session on your own tasks, tools and questions. This round has 40 sessions in total, sold in order. Every 8 sessions the price steps up, so the earlier you book, the less you pay." },
-    showHours: { type: ControlType.Boolean, title: "Show hours", defaultValue: true },
-    opensLabel: { type: ControlType.String, title: "Opens label", defaultValue: "Bookings open the week of Sunday 29 November 2026." },
-    primaryColor: { type: ControlType.Color, title: "Primary", defaultValue: "#14213D" },
-    accentColor: { type: ControlType.Color, title: "Accent", defaultValue: "#C86D2D" },
-    creamColor: { type: ControlType.Color, title: "Cream", defaultValue: "#FAF8F5" },
+    bookedCountProp: {
+        type: ControlType.Number,
+        title: "Sessions Booked",
+        defaultValue: 0,
+        min: 0,
+        max: 40,
+        step: 1,
+    },
+    liveInventoryUrl: {
+        type: ControlType.String,
+        title: "Live JSON URL (Optional)",
+        defaultValue: "",
+    },
+    bookingUrl: {
+        type: ControlType.String,
+        title: "Booking Calendar Link",
+        defaultValue: "#book-calendar",
+    },
+    primaryColor: { type: ControlType.Color, title: "Primary Navy", defaultValue: "#14213D" },
+    accentColor: { type: ControlType.Color, title: "Accent Amber", defaultValue: "#C86D2D" },
 })
