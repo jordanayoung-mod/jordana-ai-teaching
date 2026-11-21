@@ -1,0 +1,123 @@
+{
+  "name": "Jordana AI Business Autonomous Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jordana-ops-agent",
+        "responseMode": "onReceived"
+      },
+      "name": "Framer & Payment Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 260]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 0-4"
+            }
+          ]
+        }
+      },
+      "name": "Daily 8AM IST Morning Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 480]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body ? JSON.stringify($json.body) : 'Run daily 8AM IST check: inspect today\\'s Google Calendar events for any AI 1:1 or Cohort sessions and email Jordana (jordanayoung@gmail.com) a morning summary with client prep briefs.' }}",
+        "options": {
+          "systemMessage": "You are Jordana Young's autonomous business operations agent.\n\nStrict Brand & Communication Rules:\n- Write in warm, plain English. Zero em dashes or en dashes. Zero AI buzzwords.\n- Prices are in ILS. All session times are in Israel Time (Asia/Jerusalem).\n- Never use the titles 'Senior Researcher' or 'User Researcher'. Describe Jordana as part of the Microsoft team building Copilot Studio.\n- Always send operational alerts and morning digests to jordanayoung@gmail.com.\n\nAutonomous Workflows:\n1. event_type = 'quiz_lead': Log lead in Google Sheets CRM ('Student Pipeline' tab, Stage: 'Assessed') with Name, Email, Level, Score, Q11 goal, Q12 track, and Marketing Consent. Email the client their tailored level roadmap.\n2. event_type = 'waitlist_join': Log in Google Sheets CRM (Stage: 'Waitlist') and email confirmation for their chosen December 2026 cohort.\n3. event_type = 'b2b_quote': Log in Google Sheets CRM ('B2B Pipeline' tab, Stage: 'Inquiry'). Research the company domain if provided, email Jordana (jordanayoung@gmail.com) a 1-page Discovery Call brief, and email the client confirming we will reply within one business day.\n4. event_type = 'payment_confirmed': Increment 'bookedCount' in the Inventory sheet, create a Google Calendar event titled '[Level] Client Name - AI 1:1' (respecting Sun-Thu 11:00-20:00 IST, blocking 12:00-12:30 daily and 16:30-18:30 Mondays), attach Jordana's 1-page pre-session brief in the event description, and email the client their level-tailored Prep Package.\n5. Daily 8AM Check: Read today's calendar events and email Jordana a clean morning summary."
+        }
+      },
+      "name": "Jordana Autonomous Ops Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [540, 360]
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-20250514"
+      },
+      "name": "Anthropic Claude Brain",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [420, 620]
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "summary": "={{ $fromAI('event_title', 'Format: [Level] Client Name - AI 1:1') }}",
+        "start": "={{ $fromAI('start_iso', 'Session start time in ISO 8601 format') }}",
+        "end": "={{ $fromAI('end_iso', 'Session end time in ISO 8601 format') }}",
+        "description": "={{ $fromAI('one_page_brief', 'Compiled 1-page pre-session brief for Jordana') }}"
+      },
+      "name": "Create Calendar Booking",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [580, 620]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": "primary",
+        "returnAll": true
+      },
+      "name": "Read Calendar Events",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [720, 620]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI('recipient_email', 'Recipient email address') }}",
+        "subject": "={{ $fromAI('email_subject', 'Plain English subject line with zero em dashes') }}",
+        "message": "={{ $fromAI('email_body', 'Warm plain English email body') }}"
+      },
+      "name": "Send Gmail Message",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [860, 620]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID",
+        "sheetName": "={{ $fromAI('sheet_tab', 'Student Pipeline, B2B Pipeline, or Inventory') }}"
+      },
+      "name": "Google Sheets CRM & Inventory",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [1000, 620]
+    }
+  ],
+  "connections": {
+    "Framer & Payment Webhook": {
+      "main": [[{"node": "Jordana Autonomous Ops Agent", "type": "main", "index": 0}]]
+    },
+    "Daily 8AM IST Morning Check": {
+      "main": [[{"node": "Jordana Autonomous Ops Agent", "type": "main", "index": 0}]]
+    },
+    "Anthropic Claude Brain": {
+      "ai_languageModel": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Create Calendar Booking": {
+      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+    },
+    "Read Calendar Events": {
+      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+    },
+    "Send Gmail Message": {
+      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+    },
+    "Google Sheets CRM & Inventory": {
+      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+    }
+  }
+}

@@ -1,18 +1,1065 @@
 {
-  "name": "Jordana AI Business Autonomous Agent",
+  "name": "Jordana Ops Agent",
   "nodes": [
     {
+      "id": "b1aa3772-2f40-4096-b8ca-339e71308196",
+      "name": "Framer and Payment Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        624
+      ],
       "parameters": {
         "httpMethod": "POST",
         "path": "jordana-ops-agent",
-        "responseMode": "onReceived"
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://jordanayoung-mod.github.io,https://REPLACE-WITH-FRAMER-SITE.framer.website"
+        }
       },
-      "name": "Framer & Payment Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [220, 260]
+      "webhookId": "f3659e68-abcb-4029-8078-b3eb57b42430"
     },
     {
+      "id": "1f3534ee-4bb5-46d4-b72d-a8d75d213971",
+      "name": "Normalize Event",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        624
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "event_type",
+              "value": "={{ $json.body?.event_type ?? $json.event_type ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "payload",
+              "value": "={{ $json.body ?? {} }}",
+              "type": "object"
+            },
+            {
+              "id": "a2",
+              "name": "provided_key",
+              "value": "={{ $json.headers?.['x-jordana-key'] ?? '' }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "433c4f89-bcf0-4fbd-9d6c-e16b38c165d8",
+      "name": "Route Event",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        608
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "payment",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "payment_confirmed"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "form",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "quiz_lead"
+                  },
+                  {
+                    "leftValue": "={{ $json.event_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "waitlist_join"
+                  },
+                  {
+                    "leftValue": "={{ $json.event_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "b2b_quote"
+                  }
+                ],
+                "combinator": "or"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Unknown"
+        }
+      }
+    },
+    {
+      "id": "ee8608cc-6991-4d45-a349-2a5bc3e95856",
+      "name": "Check Webhook Secret",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        288
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.provided_key }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "leftValue": "={{ $json.provided_key }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "={{ $vars.JORDANA_WEBHOOK_KEY }}"
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "6e01f114-b194-45f7-8586-741455a5dd59",
+      "name": "Check Booking Hours",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        192
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const zone = 'Asia/Jerusalem';\nconst p = $json.payload || {};\nconst raw = String(p.session_start || p.start || '');\nconst mins = Number(p.duration_minutes || 60);\nconst reasons = [];\nconst result = { ...$json };\nconst start = DateTime.fromISO(raw, { zone }).setZone(zone);\nif (!raw || !start.isValid) {\n  reasons.push('missing or invalid session_start');\n} else {\n  const end = start.plus({ minutes: mins });\n  const wd = start.weekday;\n  const s = start.hour * 60 + start.minute;\n  const e = s + mins;\n  if (![7, 1, 2, 3, 4].includes(wd)) reasons.push('not Sunday to Thursday');\n  if (!start.hasSame(end, 'day')) reasons.push('runs past midnight');\n  if (s < 11 * 60 || e > 20 * 60) reasons.push('outside 11:00 to 20:00 Israel time');\n  if (s < 12 * 60 + 30 && e > 12 * 60) reasons.push('overlaps the 12:00 to 12:30 lunch break');\n  if (wd === 1 && s < 18 * 60 + 30 && e > 16 * 60 + 30) reasons.push('overlaps the Monday 16:30 to 18:30 block');\n  if (start < DateTime.fromISO('2026-11-29T00:00:00', { zone })) reasons.push('before bookings open (week of 29 November 2026)');\n  result.start_iso = start.toISO();\n  result.end_iso = end.toISO();\n}\nresult.within_hours = reasons.length === 0;\nresult.hours_problem = reasons.join('; ');\nreturn { json: result };"
+      }
+    },
+    {
+      "id": "2b6e9923-4d19-45d3-b3ff-b4288666aaeb",
+      "name": "Within Bookable Hours?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        192
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.within_hours }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "63486a5a-7203-4e54-b024-b6886cd13ae7",
+      "name": "Find Clashing Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.4,
+      "position": [
+        1344,
+        96
+      ],
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.start_iso }}",
+        "timeMax": "={{ $json.end_iso }}",
+        "options": {
+          "recurringEventHandling": "expand"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "62aee9a9-27b9-42eb-b554-4a975480a2a9",
+      "name": "Count Clashes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        96
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const base = $('Check Booking Hours').first().json;\nconst clashes = $input.all().filter(i => i.json && i.json.id && i.json.status !== 'cancelled' && i.json.transparency !== 'transparent');\nreturn [{ json: { ...base, clash_count: clashes.length, clash_titles: clashes.map(c => c.json.summary || 'busy').join(', '), slot_free: clashes.length === 0 } }];"
+      }
+    },
+    {
+      "id": "b5f533cc-7386-44c0-842d-df3866318f44",
+      "name": "Slot Free?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        96
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.slot_free }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "e4fdd7e7-db0e-4b32-82a6-596c5d12c766",
+      "name": "Create Calendar Booking",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.4,
+      "position": [
+        2016,
+        0
+      ],
+      "parameters": {
+        "resource": "event",
+        "operation": "create",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "start": "={{ $json.start_iso }}",
+        "end": "={{ $json.end_iso }}",
+        "additionalFields": {
+          "summary": "=[{{ $json.payload.level ?? 'Client' }}] {{ $json.payload.name ?? $json.payload.email ?? 'New client' }}, AI 1:1",
+          "description": "=Client: {{ $json.payload.name ?? '' }} ({{ $json.payload.email ?? '' }})\nDate and time: {{ $json.start_iso }} IST\nLevel: {{ $json.payload.level ?? 'unknown' }} ({{ $json.payload.score ?? '?' }}/30)\nTrack: {{ $json.payload.q12 ?? '' }}\nNumber 1 goal: {{ $json.payload.q11 ?? '' }}\nPrice paid: {{ $json.payload.tier_price ?? '' }} ILS\nGame plan: first 10 minutes quick win, core 35 minutes build and test, final 15 minutes save the reusable prompt or workflow.",
+          "sendUpdates": "none"
+        }
+      }
+    },
+    {
+      "id": "94b8569c-75b4-42d9-9d6c-eae2a7c4ddcb",
+      "name": "Read Inventory Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2240,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Inventory"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Item",
+              "lookupValue": "1:1 sessions"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "30801d00-258b-4459-aa00-1c3e537b0683",
+      "name": "Increment Booked Count",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        0
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "Item",
+              "value": "1:1 sessions",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "bookedCount",
+              "value": "={{ Number($json.bookedCount || 0) + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "a2",
+              "name": "Updated At",
+              "value": "={{ $now.setZone('Asia/Jerusalem').toISO() }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dc7510ea-0abc-4348-b751-387030b70f02",
+      "name": "Update Inventory",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2688,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Inventory"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Item": "={{ $json.Item }}",
+            "bookedCount": "={{ $json.bookedCount }}",
+            "Updated At": "={{ $json[\"Updated At\"] }}"
+          },
+          "matchingColumns": [
+            "Item"
+          ],
+          "schema": [
+            {
+              "id": "Item",
+              "displayName": "Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bookedCount",
+              "displayName": "bookedCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Updated At",
+              "displayName": "Updated At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "06d5e5e7-9e25-4532-9c9e-44e1740c93a9",
+      "name": "Mark Booked",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2912,
+        0
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "event_type",
+              "value": "payment_confirmed",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "payload",
+              "value": "={{ $('Normalize Event').item.json.payload }}",
+              "type": "object"
+            },
+            {
+              "id": "a2",
+              "name": "booking_status",
+              "value": "booked",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "booking_note",
+              "value": "={{ $('Check Booking Hours').item.json.start_iso }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "calendar_link",
+              "value": "={{ $('Create Calendar Booking').item.json.htmlLink ?? '' }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0833bf24-9dce-46b0-a682-e46d8380bf09",
+      "name": "Respond Payment Received",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        3136,
+        192
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true, booking_status: $json.booking_status }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "97b45dc7-0b14-4094-9211-ca006992ce75",
+      "name": "Build Agent Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3360,
+        624
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "agent_prompt",
+              "value": "=Event type: {{ $json.event_type }}\nBooking status: {{ $json.booking_status ?? 'n/a' }}\nBooking note: {{ $json.booking_note ?? '' }}\nCalendar link: {{ $json.calendar_link ?? '' }}\nPayload: {{ JSON.stringify($json.payload ?? {}) }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b5bb9849-8d78-4821-b65d-82c024a8e12c",
+      "name": "Jordana Ops Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3840,
+        624
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.agent_prompt }}",
+        "options": {
+          "systemMessage": "You are Jordana Young's business operations agent.\n\nBrand and communication rules:\n- Write in warm, plain English. Zero em dashes or en dashes. Zero AI buzzwords.\n- Prices are in ILS. All session times are in Israel time (Asia/Jerusalem).\n- Never use the titles 'Senior Researcher' or 'User Researcher'. Describe Jordana as part of the Microsoft team building Copilot Studio.\n- Send operational alerts and the morning digest to jordanayoung@gmail.com.\n- Only email a client the confirmation, roadmap or prep package described below. Never promise a time that is not already booked.\n\nTools you can use: 'Log Student Pipeline', 'Log B2B Pipeline', 'Read Inventory', 'Read Today Calendar', 'Send Gmail Message'.\n\nWhat to do for each event type:\n1. quiz_lead: use 'Log Student Pipeline' with Stage 'Assessed' (Name, Email, Level, Score, Q11 Goal, Q12 Track, Marketing Consent). Then use 'Send Gmail Message' to email the client their level roadmap.\n2. waitlist_join: use 'Log Student Pipeline' with Stage 'Waitlist' and the Cohort. Then email the client a confirmation for their chosen December 2026 cohort.\n3. b2b_quote: use 'Log B2B Pipeline' with Stage 'Inquiry'. Email Jordana a 1-page discovery call brief and email the client that she'll reply within one business day.\n4. payment_confirmed with booking status 'booked': the calendar event is already created and the inventory count already increased. Use 'Log Student Pipeline' with Stage 'Booked', email the client their level-tailored prep package, and email Jordana the 1-page pre-session brief.\n5. payment_confirmed with booking status 'needs_reschedule': nothing was booked. Email Jordana the client details and the booking note so she can offer a new time. Do not email the client.\n6. daily_digest: use 'Read Today Calendar' and email Jordana a short morning summary of today's sessions with a prep note for each one. If there are none, say so in one line.\n\nUse 'Read Inventory' only when you need the current 1:1 booked count.",
+          "maxIterations": 8
+        }
+      }
+    },
+    {
+      "id": "3c48e0cc-10c2-41e0-839b-0338f04d5324",
+      "name": "Anthropic Claude Brain",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.6,
+      "position": [
+        3584,
+        848
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "claude-sonnet-4-20250514"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c923d17d-a135-4433-91ae-22e5e25abaf3",
+      "name": "Read Today Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.4,
+      "position": [
+        3712,
+        848
+      ],
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $now.setZone('Asia/Jerusalem').startOf('day').toISO() }}",
+        "timeMax": "={{ $now.setZone('Asia/Jerusalem').endOf('day').toISO() }}",
+        "options": {
+          "orderBy": "startTime",
+          "recurringEventHandling": "expand",
+          "timeZone": {
+            "__rl": true,
+            "mode": "id",
+            "value": "Asia/Jerusalem"
+          }
+        }
+      }
+    },
+    {
+      "id": "f71c1685-506f-4464-bc12-b3507896a38d",
+      "name": "Send Gmail Message",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        3840,
+        848
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('recipient_email', 'Recipient email address') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email_subject', 'Plain English subject line with zero em dashes') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email_body', 'Warm plain English email body with zero em dashes') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "ee1436c1-1b1e-4298-91ec-11b78e9e55f6"
+    },
+    {
+      "id": "1a3aeed8-d611-4500-963a-915601c3ed53",
+      "name": "Log Student Pipeline",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        3968,
+        848
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Student Pipeline"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', 'Client email address, used to find their row') }}",
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', 'Client first name') }}",
+            "Stage": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('stage', 'Assessed, Waitlist or Booked') }}",
+            "Level": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('level', 'Beginner, Intermediate, Advanced or Expert') }}",
+            "Score": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('score', 'Quiz score out of 30, empty if unknown') }}",
+            "Q11 Goal": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('q11_goal', 'Their answer to question 11') }}",
+            "Q12 Track": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('q12_track', 'Their answer to question 12') }}",
+            "Cohort": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('cohort', 'Chosen cohort, empty if none') }}",
+            "Marketing Consent": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('marketing_consent', 'true or false') }}",
+            "Updated At": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('updated_at', 'Current date and time in Israel time, ISO 8601') }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Level",
+              "displayName": "Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Q11 Goal",
+              "displayName": "Q11 Goal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Q12 Track",
+              "displayName": "Q12 Track",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Cohort",
+              "displayName": "Cohort",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Marketing Consent",
+              "displayName": "Marketing Consent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Updated At",
+              "displayName": "Updated At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "1c12870b-5271-4786-9e48-08c248d76dcf",
+      "name": "Log B2B Pipeline",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        4096,
+        848
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "B2B Pipeline"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', 'Work email address, used to find their row') }}",
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', 'Contact name') }}",
+            "Company": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('company', 'Company or organization') }}",
+            "Team Size": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('team_size', 'Team size range') }}",
+            "Task Description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('task_description', 'The workflow they want built') }}",
+            "Stage": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('stage', 'Inquiry') }}",
+            "Marketing Consent": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('marketing_consent', 'true or false') }}",
+            "Updated At": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('updated_at', 'Current date and time in Israel time, ISO 8601') }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Team Size",
+              "displayName": "Team Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Task Description",
+              "displayName": "Task Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Marketing Consent",
+              "displayName": "Marketing Consent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Updated At",
+              "displayName": "Updated At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "db011e29-a025-4a6d-8c07-88640022f4ee",
+      "name": "Read Inventory",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        4224,
+        848
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Inventory"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "68281a94-a71f-4a33-a72c-5c10dc702538",
+      "name": "Mark Slot Taken",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2912,
+        192
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "event_type",
+              "value": "payment_confirmed",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "payload",
+              "value": "={{ $('Normalize Event').item.json.payload }}",
+              "type": "object"
+            },
+            {
+              "id": "a2",
+              "name": "booking_status",
+              "value": "needs_reschedule",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "booking_note",
+              "value": "={{ 'Requested time clashes with: ' + $json.clash_titles }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "calendar_link",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e7491c82-d89c-493a-8d3a-6df793ffe818",
+      "name": "Mark Outside Hours",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2912,
+        384
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "event_type",
+              "value": "payment_confirmed",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "payload",
+              "value": "={{ $('Normalize Event').item.json.payload }}",
+              "type": "object"
+            },
+            {
+              "id": "a2",
+              "name": "booking_status",
+              "value": "needs_reschedule",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "booking_note",
+              "value": "={{ 'Requested time not bookable: ' + $json.hours_problem }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "calendar_link",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "64b7d8b9-4fb2-406e-9906-e63dda7a08c5",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        480
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"error\":\"unauthorized\"}",
+        "options": {
+          "responseCode": 401
+        }
+      }
+    },
+    {
+      "id": "a625067d-bc9b-4f1c-a254-ad5864d29018",
+      "name": "Respond Form OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        3136,
+        624
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\":true}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "2922e45d-f6f1-41ee-8c9c-eecd7edb51ed",
+      "name": "Respond Unknown Event",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        768
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"error\":\"unknown event_type\"}",
+        "options": {
+          "responseCode": 400
+        }
+      }
+    },
+    {
+      "id": "43d149b0-5eb7-44e2-8f54-b1ba9a54400e",
+      "name": "Daily 8AM IST Morning Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        2912,
+        816
+      ],
       "parameters": {
         "rule": {
           "interval": [
@@ -22,102 +1069,428 @@
             }
           ]
         }
-      },
-      "name": "Daily 8AM IST Morning Check",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
-      "position": [220, 480]
+      }
     },
     {
+      "id": "8791e7c0-1cf6-440d-bf94-b5932cd48cab",
+      "name": "Daily Digest Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3136,
+        816
+      ],
       "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.body ? JSON.stringify($json.body) : 'Run daily 8AM IST check: inspect today\\'s Google Calendar events for any AI 1:1 or Cohort sessions and email Jordana (jordanayoung@gmail.com) a morning summary with client prep briefs.' }}",
-        "options": {
-          "systemMessage": "You are Jordana Young's autonomous business operations agent.\n\nStrict Brand & Communication Rules:\n- Write in warm, plain English. Zero em dashes or en dashes. Zero AI buzzwords.\n- Prices are in ILS. All session times are in Israel Time (Asia/Jerusalem).\n- Never use the titles 'Senior Researcher' or 'User Researcher'. Describe Jordana as part of the Microsoft team building Copilot Studio.\n- Always send operational alerts and morning digests to jordanayoung@gmail.com.\n\nAutonomous Workflows:\n1. event_type = 'quiz_lead': Log lead in Google Sheets CRM ('Student Pipeline' tab, Stage: 'Assessed') with Name, Email, Level, Score, Q11 goal, Q12 track, and Marketing Consent. Email the client their tailored level roadmap.\n2. event_type = 'waitlist_join': Log in Google Sheets CRM (Stage: 'Waitlist') and email confirmation for their chosen December 2026 cohort.\n3. event_type = 'b2b_quote': Log in Google Sheets CRM ('B2B Pipeline' tab, Stage: 'Inquiry'). Research the company domain if provided, email Jordana (jordanayoung@gmail.com) a 1-page Discovery Call brief, and email the client confirming we will reply within one business day.\n4. event_type = 'payment_confirmed': Increment 'bookedCount' in the Inventory sheet, create a Google Calendar event titled '[Level] Client Name - AI 1:1' (respecting Sun-Thu 11:00-20:00 IST, blocking 12:00-12:30 daily and 16:30-18:30 Mondays), attach Jordana's 1-page pre-session brief in the event description, and email the client their level-tailored Prep Package.\n5. Daily 8AM Check: Read today's calendar events and email Jordana a clean morning summary."
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "event_type",
+              "value": "daily_digest",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "payload",
+              "value": "={{ ({ date: $now.setZone('Asia/Jerusalem').toISODate() }) }}",
+              "type": "object"
+            }
+          ]
         }
-      },
-      "name": "Jordana Autonomous Ops Agent",
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 1.7,
-      "position": [540, 360]
+      }
     },
     {
+      "id": "1c3205d6-fa5d-481f-85be-fd70a3f8a2eb",
+      "name": "Sticky Note ac73452e",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        512
+      ],
       "parameters": {
-        "model": "claude-sonnet-4-20250514"
-      },
-      "name": "Anthropic Claude Brain",
-      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
-      "typeVersion": 1.2,
-      "position": [420, 620]
-    },
-    {
-      "parameters": {
-        "calendar": "primary",
-        "summary": "={{ $fromAI('event_title', 'Format: [Level] Client Name - AI 1:1') }}",
-        "start": "={{ $fromAI('start_iso', 'Session start time in ISO 8601 format') }}",
-        "end": "={{ $fromAI('end_iso', 'Session end time in ISO 8601 format') }}",
-        "description": "={{ $fromAI('one_page_brief', 'Compiled 1-page pre-session brief for Jordana') }}"
-      },
-      "name": "Create Calendar Booking",
-      "type": "n8n-nodes-base.googleCalendarTool",
-      "typeVersion": 1.2,
-      "position": [580, 620]
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "calendar": "primary",
-        "returnAll": true
-      },
-      "name": "Read Calendar Events",
-      "type": "n8n-nodes-base.googleCalendarTool",
-      "typeVersion": 1.2,
-      "position": [720, 620]
-    },
-    {
-      "parameters": {
-        "sendTo": "={{ $fromAI('recipient_email', 'Recipient email address') }}",
-        "subject": "={{ $fromAI('email_subject', 'Plain English subject line with zero em dashes') }}",
-        "message": "={{ $fromAI('email_body', 'Warm plain English email body') }}"
-      },
-      "name": "Send Gmail Message",
-      "type": "n8n-nodes-base.gmailTool",
-      "typeVersion": 2.1,
-      "position": [860, 620]
-    },
-    {
-      "parameters": {
-        "operation": "appendOrUpdate",
-        "documentId": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID",
-        "sheetName": "={{ $fromAI('sheet_tab', 'Student Pipeline, B2B Pipeline, or Inventory') }}"
-      },
-      "name": "Google Sheets CRM & Inventory",
-      "type": "n8n-nodes-base.googleSheetsTool",
-      "typeVersion": 4.5,
-      "position": [1000, 620]
+        "content": "## Setup before activating\n1. Connect credentials: Google Calendar, Gmail, Google Sheets, Anthropic.\n2. Replace REPLACE_WITH_YOUR_GOOGLE_SHEET_ID in the Sheets nodes.\n3. Create the n8n Variable JORDANA_WEBHOOK_KEY. Payment calls must send it in the X-Jordana-Key header.\n4. Replace the framer.website placeholder in the webhook Allowed Origins with the real site domain.",
+        "color": 4,
+        "width": 608,
+        "height": 256
+      }
     }
   ],
   "connections": {
-    "Framer & Payment Webhook": {
-      "main": [[{"node": "Jordana Autonomous Ops Agent", "type": "main", "index": 0}]]
+    "Framer and Payment Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Daily 8AM IST Morning Check": {
-      "main": [[{"node": "Jordana Autonomous Ops Agent", "type": "main", "index": 0}]]
+    "Normalize Event": {
+      "main": [
+        [
+          {
+            "node": "Route Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Anthropic Claude Brain": {
-      "ai_languageModel": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_languageModel", "index": 0}]]
+    "Route Event": {
+      "main": [
+        [
+          {
+            "node": "Check Webhook Secret",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Form OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Unknown Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Webhook Secret": {
+      "main": [
+        [
+          {
+            "node": "Check Booking Hours",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Booking Hours": {
+      "main": [
+        [
+          {
+            "node": "Within Bookable Hours?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Within Bookable Hours?": {
+      "main": [
+        [
+          {
+            "node": "Find Clashing Events",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Outside Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Clashing Events": {
+      "main": [
+        [
+          {
+            "node": "Count Clashes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count Clashes": {
+      "main": [
+        [
+          {
+            "node": "Slot Free?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slot Free?": {
+      "main": [
+        [
+          {
+            "node": "Create Calendar Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Slot Taken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Create Calendar Booking": {
-      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Read Inventory Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Read Calendar Events": {
-      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+    "Read Inventory Row": {
+      "main": [
+        [
+          {
+            "node": "Increment Booked Count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Booked Count": {
+      "main": [
+        [
+          {
+            "node": "Update Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Inventory": {
+      "main": [
+        [
+          {
+            "node": "Mark Booked",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Booked": {
+      "main": [
+        [
+          {
+            "node": "Respond Payment Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond Payment Received": {
+      "main": [
+        [
+          {
+            "node": "Build Agent Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Agent Input": {
+      "main": [
+        [
+          {
+            "node": "Jordana Ops Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Claude Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Jordana Ops Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Today Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jordana Ops Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Send Gmail Message": {
-      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+      "ai_tool": [
+        [
+          {
+            "node": "Jordana Ops Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Google Sheets CRM & Inventory": {
-      "ai_tool": [[{"node": "Jordana Autonomous Ops Agent", "type": "ai_tool", "index": 0}]]
+    "Log Student Pipeline": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jordana Ops Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log B2B Pipeline": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jordana Ops Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Inventory": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jordana Ops Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Slot Taken": {
+      "main": [
+        [
+          {
+            "node": "Respond Payment Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Outside Hours": {
+      "main": [
+        [
+          {
+            "node": "Respond Payment Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond Form OK": {
+      "main": [
+        [
+          {
+            "node": "Build Agent Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 8AM IST Morning Check": {
+      "main": [
+        [
+          {
+            "node": "Daily Digest Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Digest Request": {
+      "main": [
+        [
+          {
+            "node": "Build Agent Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
-  }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "Asia/Jerusalem"
+  },
+  "pinData": {},
+  "active": false,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "nodeGroups": [
+    {
+      "id": "0ae31fe7-08dd-45ef-a104-2dc7399eb5f2",
+      "name": "Book slot and count it",
+      "nodeNames": [
+        "Create Calendar Booking",
+        "Read Inventory Row",
+        "Increment Booked Count",
+        "Update Inventory",
+        "Mark Booked"
+      ],
+      "description": "Creates the 1:1 calendar event, then adds one to bookedCount on the Inventory tab"
+    },
+    {
+      "id": "d5f20557-6eae-471a-b4ed-9e5a16db228a",
+      "name": "Ops agent",
+      "nodeNames": [
+        "Build Agent Input",
+        "Jordana Ops Agent",
+        "Anthropic Claude Brain",
+        "Read Today Calendar",
+        "Send Gmail Message",
+        "Log Student Pipeline",
+        "Log B2B Pipeline",
+        "Read Inventory"
+      ],
+      "description": "Claude logs leads to the Sheets CRM, emails clients and Jordana, and writes the 08:00 digest"
+    }
+  ]
 }

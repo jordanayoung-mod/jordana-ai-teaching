@@ -1,19 +1,59 @@
-# n8n: Jordana ops agent
+# n8n: Jordana Ops Agent
 
-`jordana-ops-agent.json` is Jordana's workflow, unchanged. It hasn't been imported anywhere yet.
+| File | What it is |
+|---|---|
+| `jordana-ops-agent.json` | The fixed workflow, exported from n8n (workflow "Jordana Ops Agent", id `jURR7yFR0lGEtqWW`) |
+| `jordana-ops-agent.sdk.ts` | The same workflow as n8n Workflow SDK code |
+| `original/jordana-ops-agent.json` | Jordana's original workflow, unchanged |
 
-## What to set after importing
+- Editor: https://jordanaop.app.n8n.cloud/workflow/jURR7yFR0lGEtqWW
+- Production webhook: `POST https://jordanaop.app.n8n.cloud/webhook/jordana-ops-agent` (only works once the workflow is published)
+- Test webhook: `POST https://jordanaop.app.n8n.cloud/webhook-test/jordana-ops-agent` (only while "Listen for test event" is on in the editor)
+- Workflow time zone: Asia/Jerusalem, so the `0 8 * * 0-4` schedule fires at 08:00 Israel time, Sunday to Thursday.
+- Status: saved, not published, never run. No credentials were created.
 
-1. **Google Sheet ID:** replace `REPLACE_WITH_YOUR_GOOGLE_SHEET_ID` in the "Google Sheets CRM & Inventory" node. The sheet needs the tabs `Student Pipeline`, `B2B Pipeline` and `Inventory`.
-2. **Credentials:** connect Google Calendar (both calendar nodes), Gmail ("Send Gmail Message"), Google Sheets ("Google Sheets CRM & Inventory") and Anthropic ("Anthropic Claude Brain").
-3. **Time zone:** in Workflow Settings set the time zone to `Asia/Jerusalem`, so the `0 8 * * 0-4` schedule fires at 08:00 Israel time, Sunday to Thursday. Without it the cron uses the n8n instance's default zone.
-4. **Webhook URL:** activate the workflow, copy the production URL of "Framer & Payment Webhook" (`POST /jordana-ops-agent`) and paste it into the **n8n Webhook URL** property of every `AILevelQuiz`, `OfferingsAndCohorts` and `WorkflowBuildsAndAbout` instance in Framer.
+## What changed from the original
 
-## Things to check before going live
+1. **Google Sheets.** One tool per tab with real column mappings: `Log Student Pipeline` and `Log B2B Pipeline` (append or update, matched on `Email`), plus a `Read Inventory` tool. Paid bookings add one to `bookedCount` in fixed nodes (Read Inventory Row, Increment Booked Count, Update Inventory matched on `Item`), so the count doesn't depend on the AI.
+2. **Calendar reads** are limited to today in Israel time (start of day to end of day, Asia/Jerusalem).
+3. **Webhook secret.** `payment_confirmed` is only accepted when the `X-Jordana-Key` header matches the n8n Variable `JORDANA_WEBHOOK_KEY`. Otherwise the webhook answers 401 and nothing runs. The Framer forms (`quiz_lead`, `waitlist_join`, `b2b_quote`) don't send a key, because anything in browser code is public.
+4. **Allowed origins** on the webhook: `https://jordanayoung-mod.github.io` and a placeholder `https://REPLACE-WITH-FRAMER-SITE.framer.website`.
+5. **Hours and clash check before booking.** The requested slot must be Sunday to Thursday, 11:00 to 20:00 Israel time, not touch 12:00 to 12:30, not touch Monday 16:30 to 18:30, start on or after 29 November 2026, and not overlap anything already in the calendar. If it fails, nothing is booked: the agent emails Jordana the details so she can offer a new time.
+6. The webhook now answers the browser straight away (`{"ok":true}`), and the AI work runs after that. Unknown `event_type` gets a 400.
 
-- **Google Sheets tool** has no column mapping and no "column to match on" for `appendOrUpdate`, so it can't reliably write a row or update `bookedCount`. Map the columns (Name, Email, Level, Score, Q11, Q12, Marketing Consent, Stage, and so on) or add a separate read tool so the agent can increment the count.
-- **Read Calendar Events** has no time range (`returnAll` with no start or end), so the 08:00 digest reads every event on the calendar. Set "After" to the start of today and "Before" to the end of today (Israel time).
-- **Webhook is open:** anyone who finds the URL can post `payment_confirmed` and create a booking. Payment events should come from the gateway with its signature checked (or a secret header), separate from the public form events.
-- **Browser calls (CORS):** the Framer forms post from the browser with `Content-Type: application/json`. Set the webhook's Allowed Origins to the site's domain or the browser will block the request and the forms will show their retry message.
-- **Booking hours** (Sunday to Thursday 11:00 to 20:00, breaks at 12:00 to 12:30 and Mondays 16:30 to 18:30) are only in the agent's instructions. Nothing checks for clashes with existing events before "Create Calendar Booking" runs.
-- The site's 1:1 price widget reads a booked count (or a JSON URL). Nothing in this workflow publishes the Inventory count back to the site yet.
+## Sheet layout
+
+| Tab | Header row |
+|---|---|
+| `Student Pipeline` | Email, Name, Stage, Level, Score, Q11 Goal, Q12 Track, Cohort, Marketing Consent, Updated At |
+| `B2B Pipeline` | Email, Name, Company, Team Size, Task Description, Stage, Marketing Consent, Updated At |
+| `Inventory` | Item, bookedCount, Updated At (one row: `1:1 sessions`, `0`) |
+
+## Payment event shape
+
+The payment gateway (or a small mapping step after it) should send:
+
+```
+POST /webhook/jordana-ops-agent
+X-Jordana-Key: <your secret>
+Content-Type: application/json
+
+{ "event_type": "payment_confirmed", "name": "...", "email": "...", "level": "Beginner",
+  "score": 6, "q11": "...", "q12": "...", "tier_price": 400,
+  "session_start": "2026-12-01T11:00:00+02:00", "duration_minutes": 60 }
+```
+
+PayPlus, Grow and Cardcom each send their own format, so this usually needs a small mapping step that also checks the gateway's own signature.
+
+## What Jordana must do in n8n
+
+1. **Credentials** (Credentials > Add credential, then pick them on each node):
+   - Google Sheets OAuth2: Log Student Pipeline, Log B2B Pipeline, Read Inventory, Read Inventory Row, Update Inventory
+   - Google Calendar OAuth2: Read Today Calendar, Find Clashing Events, Create Calendar Booking
+   - Gmail OAuth2: Send Gmail Message
+   - Anthropic API key: Anthropic Claude Brain. When the workflow was created, n8n picked its "Gateway credits" credential for this node on its own. Switch it to your Anthropic key if you want usage billed to your own Anthropic account.
+2. **Sheet ID:** create the Google Sheet with the three tabs above and replace `REPLACE_WITH_YOUR_GOOGLE_SHEET_ID` in all five Sheets nodes.
+3. **Secret:** make a long random value. Save it in n8n as the Variable `JORDANA_WEBHOOK_KEY` (Overview > Variables) and set the same value as the `X-Jordana-Key` header in the payment gateway's webhook settings. If Variables isn't available on your plan, put the value straight into the right-hand side of "Check Webhook Secret" in n8n, and don't commit that export to git.
+4. **Allowed origins:** after publishing the Framer site, replace the `REPLACE-WITH-FRAMER-SITE.framer.website` placeholder in the webhook options with the real domain (and any custom domain).
+5. **Test** with "Listen for test event" and the test URL, then **Publish**.
+6. **Framer:** paste the production URL `https://jordanaop.app.n8n.cloud/webhook/jordana-ops-agent` into the **n8n Webhook URL** property of every `AILevelQuiz`, `OfferingsAndCohorts` and `WorkflowBuildsAndAbout` instance (Home, /assessment, /cohorts, /company-builds, /about).
