@@ -7,20 +7,21 @@ function state(sold) {
   return logic.priceState(sold, inventory.tiers);
 }
 
-assert.strictEqual(logic.leftLine(state(0)), "10 of 10 left at 400 ILS");
-assert.strictEqual(logic.nextLine(state(0)), "Next price: 600 ILS.");
-assert.strictEqual(logic.leftLine(state(7)), "3 of 10 left at 400 ILS");
+assert.strictEqual(logic.leftLine(state(0)), "8 of 8 left at ₪400");
+assert.strictEqual(logic.nextLine(state(0)), "Next price: ₪600.");
+assert.strictEqual(logic.leftLine(state(7)), "1 of 8 left at ₪400");
 assert.strictEqual(state(7).nextPriceIls, 600);
-assert.strictEqual(logic.leftLine(state(10)), "10 of 10 left at 600 ILS");
-assert.strictEqual(logic.nextLine(state(10)), "Next price: 800 ILS.");
-assert.strictEqual(logic.leftLine(state(20)), "10 of 10 left at 800 ILS");
-assert.strictEqual(logic.leftLine(state(35)), "5 of 10 left at 1,200 ILS");
+assert.strictEqual(logic.leftLine(state(8)), "8 of 8 left at ₪600");
+assert.strictEqual(logic.nextLine(state(8)), "Next price: ₪750.");
+assert.strictEqual(logic.leftLine(state(16)), "8 of 8 left at ₪750");
+assert.strictEqual(logic.leftLine(state(24)), "8 of 8 left at ₪950");
+assert.strictEqual(logic.leftLine(state(35)), "5 of 8 left at ₪1,200");
 assert.strictEqual(logic.nextLine(state(35)), "This is the last price in this release.");
 assert.strictEqual(state(40).soldOut, true);
 assert.strictEqual(logic.leftLine(state(40)), "All 40 sessions in this release are sold.");
 assert.strictEqual(state(41).soldOut, true);
 assert.strictEqual(state(-3).priceIls, 400);
-assert.strictEqual(logic.formatIls(1200), "1,200 ILS");
+assert.strictEqual(logic.formatIls(1200), "₪1,200");
 
 function answers(overrides) {
   var base = {
@@ -168,7 +169,12 @@ assert.strictEqual(logic.formatSessionPattern([
   { day: "Wednesday", durationMinutes: 90 },
   { day: "Wednesday", durationMinutes: 90 }
 ]), "4 weekly Wednesday evenings, 90 minutes each (6 hours live)");
-assert.strictEqual(logic.formatRunWhen({ month: "December 2026", startDate: null }).indexOf("Starts December 2026, dates coming soon"), 0);
+assert.strictEqual(logic.formatRunWhen({ month: "December 2026", startDate: null }), "Starts December 2026, exact dates coming soon");
+assert.strictEqual(logic.formatSessionPattern([
+  { day: "Sunday", durationMinutes: 90 },
+  { day: "Sunday", durationMinutes: 90 },
+  { day: "Sunday", durationMinutes: 60 }
+]), "Sun 90 min, Sun 90 min, Sun 60 min");
 assert.strictEqual(logic.runHasDate({ startDate: null, sessions: [{ date: null }] }), false);
 assert.strictEqual(logic.runHasDate({ startDate: "2026-12-06" }), true);
 assert.strictEqual(logic.cohortSchedule({ startDate: null }).comingSoon, true);

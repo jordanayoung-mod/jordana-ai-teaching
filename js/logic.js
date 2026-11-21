@@ -14,7 +14,7 @@
     var sign = n < 0 ? "-" : "";
     var digits = String(Math.abs(n));
     var withCommas = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return sign + withCommas + " ILS";
+    return "₪" + sign + withCommas;
   }
 
   function priceState(sold, tiers) {
@@ -190,7 +190,7 @@
   function formatRunWhen(run) {
     var item = run || {};
     if (!runHasDate(item)) {
-      return "Starts " + (item.month || "soon") + ", dates coming soon";
+      return "Starts " + (item.month || "soon") + ", exact dates coming soon";
     }
     var schedule = cohortSchedule({
       startDate: item.startDate,

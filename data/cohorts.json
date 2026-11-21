@@ -1,17 +1,17 @@
 {
-  "_comment": "Open cohorts from December 2026: one Beginner Sunday group, two Beginner Monday groups, one Intermediate Wednesday group. Advanced and Expert stay in this file with visible false until you turn them on. Each run has its own sessions list, so lengths and nights can differ. startDate null shows 'Starts [month], dates coming soon'. Set startDate to YYYY-MM-DD when the first session is fixed, and set each session date and start (24-hour, Israel time) when you know them. Session 3 of every Beginner run has durationMinutes null until that length is decided. cohortPaymentUrl is the pay link for that run. enrolled is how many people have paid, out of capacity. status is open, full, or waitlist. A run also switches to the waitlist when enrolled reaches capacity.",
+  "_comment": "December 2026 open groups: two Beginner AI Starter cohorts on Sunday nights, and one Intermediate AI at Work cohort on Wednesday nights. Advanced and Expert stay visible false until Q1 2027. Each run lists its own sessions. Beginner session 3 is 60 minutes (live clinic and wrap-up). startDate null shows 'Starts December 2026, exact dates coming soon'. Set startDate to YYYY-MM-DD and each session date and start (Israel time, such as 18:00) when they are fixed. cohortPaymentUrl is that run's pay link. enrolled counts paid seats out of capacity. status is open, full, or waitlist.",
   "priceIls": 600,
   "levels": [
     {
       "id": "beginner",
       "level": "Beginner",
       "visible": true,
-      "name": "AI Starter cohort",
-      "promise": "Three live evenings, on the same night across three weeks, with other beginners beside you.",
+      "name": "AI Starter",
+      "promise": "Go from \"where do I even start?\" to using AI with confidence for real tasks every week.",
       "topics": [
         "Get comfortable in a chat tool and write a clear prompt",
         "Use it to draft, summarise, or plan a real task",
-        "Check an answer, and know what is safe to share"
+        "A 60-minute live clinic and wrap-up on a task you will use this week"
       ],
       "outcomes": [
         "Feel confident using an AI chat tool for everyday tasks.",
@@ -21,8 +21,8 @@
       ],
       "runs": [
         {
-          "id": "beginner-sunday",
-          "name": "Sunday cohort",
+          "id": "beginner-sunday-a",
+          "name": "Sunday cohort A",
           "month": "December 2026",
           "startDate": null,
           "capacity": 15,
@@ -32,12 +32,12 @@
           "sessions": [
             { "day": "Sunday", "date": null, "start": null, "durationMinutes": 90 },
             { "day": "Sunday", "date": null, "start": null, "durationMinutes": 90 },
-            { "day": "Sunday", "date": null, "start": null, "durationMinutes": null }
+            { "day": "Sunday", "date": null, "start": null, "durationMinutes": 60 }
           ]
         },
         {
-          "id": "beginner-monday-a",
-          "name": "Monday cohort A",
+          "id": "beginner-sunday-b",
+          "name": "Sunday cohort B",
           "month": "December 2026",
           "startDate": null,
           "capacity": 15,
@@ -45,24 +45,9 @@
           "status": "open",
           "cohortPaymentUrl": "",
           "sessions": [
-            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
-            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
-            { "day": "Monday", "date": null, "start": null, "durationMinutes": null }
-          ]
-        },
-        {
-          "id": "beginner-monday-b",
-          "name": "Monday cohort B",
-          "month": "December 2026",
-          "startDate": null,
-          "capacity": 15,
-          "enrolled": 0,
-          "status": "open",
-          "cohortPaymentUrl": "",
-          "sessions": [
-            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
-            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
-            { "day": "Monday", "date": null, "start": null, "durationMinutes": null }
+            { "day": "Sunday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Sunday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Sunday", "date": null, "start": null, "durationMinutes": 60 }
           ]
         }
       ]
@@ -71,12 +56,12 @@
       "id": "intermediate",
       "level": "Intermediate",
       "visible": true,
-      "name": "AI at Work cohort",
-      "promise": "Four Wednesday evenings to turn the chat tool you already use into a repeatable work habit.",
+      "name": "AI at Work",
+      "promise": "Turn hit-and-miss prompting into a personal prompt library and one reliable weekly workflow.",
       "topics": [
         "A reusable prompt framework for a task you repeat",
         "Work with a file, such as a PDF or a spreadsheet",
-        "Build two or three reliable everyday workflows",
+        "Build one reliable weekly workflow",
         "Spot a weak answer and fix it"
       ],
       "outcomes": [
@@ -108,7 +93,7 @@
       "id": "advanced",
       "level": "Advanced",
       "visible": false,
-      "name": "AI Power User cohort",
+      "name": "AI Power User",
       "promise": "Four weekly sessions to start a custom assistant or a simple workflow you will keep.",
       "topics": [
         "Pick one process worth improving",
@@ -128,7 +113,7 @@
       "id": "expert",
       "level": "Expert",
       "visible": false,
-      "name": "Agents and Automation cohort",
+      "name": "Agents and Automation",
       "promise": "Four weekly sessions to build the first working piece of an agent or an automation.",
       "topics": [
         "Map one repeated process and the check you need",

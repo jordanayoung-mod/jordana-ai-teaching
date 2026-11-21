@@ -43,7 +43,7 @@
         phone: lead.phone || "",
         level: level.level,
         path: run.name,
-        price: "600 ILS"
+        price: "₪600"
       });
     } catch (err) {
       return "";
@@ -104,7 +104,7 @@
     }
     var runs = logic.sortRuns(level.runs || []);
     if (record.levelId === "beginner") {
-      add(offer, "p", "", "You can pick a night. There are three Beginner groups in December.");
+      add(offer, "p", "", "December has two Beginner groups, both on Sunday nights. Pick either one.");
     }
     runs.forEach(function (run) {
       var state = logic.cohortAvailability(run);

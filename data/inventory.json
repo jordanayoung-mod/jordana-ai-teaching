@@ -1,10 +1,11 @@
 {
-  "_comment": "sold = how many sessions are already paid for, from 0 to 40. The site sells the steps in order: the first 10 at 400 ILS, the next 10 at 600, then 800, then 1200. Change sold and push to main. Do not reorder tiers. A later live source can replace this file: see inventoryLiveUrl in config.js and the README.",
+  "_comment": "sold = how many private 1:1 sessions are already paid for, from 0 to 40. Five tiers of 8 slots, sold in order: 400, 600, 750, 950, then 1200 ILS. Change sold and push to main. Do not reorder tiers.",
   "sold": 0,
   "tiers": [
-    { "id": "step-400", "name": "First 10", "priceIls": 400, "slots": 10 },
-    { "id": "step-600", "name": "Next 10", "priceIls": 600, "slots": 10 },
-    { "id": "step-800", "name": "Next 10", "priceIls": 800, "slots": 10 },
-    { "id": "step-1200", "name": "Last 10", "priceIls": 1200, "slots": 10 }
+    { "id": "step-400", "name": "First 8", "priceIls": 400, "slots": 8 },
+    { "id": "step-600", "name": "Next 8", "priceIls": 600, "slots": 8 },
+    { "id": "step-750", "name": "Next 8", "priceIls": 750, "slots": 8 },
+    { "id": "step-950", "name": "Next 8", "priceIls": 950, "slots": 8 },
+    { "id": "step-1200", "name": "Last 8", "priceIls": 1200, "slots": 8 }
   ]
 }

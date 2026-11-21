@@ -47,20 +47,13 @@ window.SITE_CONFIG = {
     ]
   },
 
-  /* Microsoft-named credential items and the LetsGo item are separate switches.
-     LetsGo stays off until LetsGo confirms the wording and the profile URL.
-     Microsoft naming stays on so the approved About copy can be read.
-     Set showMicrosoftNaming to false if that wording is not cleared yet.
-     No Microsoft or LetsGo logos are used, whatever these switches say. */
+  /* Microsoft naming stays on. The LetsGo badge is not shown.
+     No Microsoft logo is used. */
   features: {
-    showMicrosoftNaming: true,
-    showLetsGo: false
+    showMicrosoftNaming: true
   },
 
-  letsgo: {
-    profileUrl: "https://letsgo.co",
-    label: "Founding Coach at LetsGo"
-  },
+  linkedin: "https://www.linkedin.com/in/jordana-young",
 
   booking: {
     opensLabel: "Sunday 29 November 2026",

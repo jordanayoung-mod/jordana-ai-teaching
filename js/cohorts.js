@@ -26,7 +26,7 @@
         phone: lead.phone || "",
         level: level.level,
         path: run.name,
-        price: "600 ILS"
+        price: "₪600"
       });
     } catch (err) {
       return "";

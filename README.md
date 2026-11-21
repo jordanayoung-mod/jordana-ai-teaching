@@ -28,10 +28,9 @@ After you save, commit, and push to `main`, the site updates when the Pages work
 
 In `config.js`:
 
-- `features.showMicrosoftNaming` is `true`, so the approved About copy and the Microsoft-named credential lines are visible. Set it to `false` if that wording is not cleared yet. The About page then uses a shorter version that does not name Microsoft. The footer disclaimer stays either way.
-- `features.showLetsGo` is `false`. Set it to `true` only after LetsGo has confirmed the words "Founding Coach at LetsGo" and the profile link. Then set `letsgo.profileUrl` (it starts as `https://letsgo.co`).
+- `features.showMicrosoftNaming` stays `true`. The site describes Jordana as part of the Microsoft team building Copilot Studio. Do not add a job title from her day job.
 
-No Microsoft logo and no LetsGo logo are used, whatever the switches say.
+The LetsGo badge is not on the site. Do not add it back. Review collection stays, including the optional checkbox to share a review with LetsGo.
 
 ### Update the sold count
 
@@ -39,11 +38,12 @@ Open `data/inventory.json`. Change `sold` to the number of sessions that have be
 
 | `sold` | What the site shows |
 | --- | --- |
-| 0 | 10 of 10 left at 400 ILS. Next price: 600 ILS. |
-| 7 | 3 of 10 left at 400 ILS. Next price: 600 ILS. |
-| 10 | 10 of 10 left at 600 ILS. Next price: 800 ILS. |
-| 20 | 10 of 10 left at 800 ILS. Next price: 1,200 ILS. |
-| 35 | 5 of 10 left at 1,200 ILS. This is the last price. |
+| 0 | 8 of 8 left at ₪400. Next price: ₪600. |
+| 7 | 1 of 8 left at ₪400. Next price: ₪600. |
+| 8 | 8 of 8 left at ₪600. Next price: ₪750. |
+| 16 | 8 of 8 left at ₪750. Next price: ₪950. |
+| 24 | 8 of 8 left at ₪950. Next price: ₪1,200. |
+| 32 | 8 of 8 left at ₪1,200. This is the last price. |
 | 40 | Sold out. The booking buttons become a waitlist. |
 
 Do not reorder the four steps. Push to `main` after you change the number. Do this when a payment is confirmed, and again if you refund someone (lower `sold` by one).
@@ -102,7 +102,7 @@ Marketing consent is a separate checkbox and it starts unticked. Do not merge it
 ### Connect payment
 
 1. Choose an Israeli provider that offers Bit and credit cards (Grow, PayPlus, Cardcom, or similar).
-2. Create a payment page for the current price. Because the price steps up, you will either use one page whose amount you can pass in, or replace `booking.paymentUrl` when the step changes (400, then 600, then 800, then 1,200).
+2. Create a payment page for the current price. Because the price steps up, you will either use one page whose amount you can pass in, or replace `booking.paymentUrl` when the step changes (₪400, then ₪600, then ₪750, then ₪950, then ₪1,200).
 3. Paste the full `https://` link into `booking.paymentUrl`.
 4. In the provider, set the success redirect to your booking link (`booking.schedulerUrl`). The site also shows a "Choose a time" button with the same destination, so a visitor who is not redirected can continue.
 5. Connect invoicing (Morning / Green Invoice, iCount, or the provider's own receipts) so a receipt or tax invoice is emailed. This site never sees the card number.
@@ -160,14 +160,13 @@ You can check the scoring on your own computer with `node tests/logic.test.js`.
 
 ## Cohorts
 
-Open groups from December 2026 live in `data/cohorts.json`:
+December 2026 groups in `data/cohorts.json`:
 
-- Beginner, Sunday evenings: one group. Three sessions on Sundays. Sessions 1 and 2 are 90 minutes. Session 3 has `durationMinutes: null` until you decide the length, and the site shows "length TBC" with no total hours.
-- Beginner, Monday evenings: two groups, Monday cohort A and Monday cohort B. Same three-session shape. Set each session's `start` when the two time slots are different, for example `"18:00"` and `"20:00"`.
-- Intermediate, Wednesday evenings: one group. Four weekly sessions, 90 minutes each.
-- Advanced and Expert are in the file with `"visible": false`. They stay off the Cohorts page and the home teaser. On the questionnaire result, those levels see a note that the cohort opens soon, a waitlist link, the one-to-one option, and the custom-build quote. Set `visible` to `true` when you want the cards public, and add a `runs` list first.
+- Beginner, AI Starter, Sunday nights: two separate groups (Sunday cohort A and Sunday cohort B). Three weekly sessions: 90 minutes, 90 minutes, then a 60-minute live clinic and wrap-up.
+- Intermediate, AI at Work, Wednesday nights: one group. Four weekly 90-minute sessions.
+- Advanced and Expert stay `"visible": false` until Q1 2027. They stay off the Cohorts page. On the questionnaire result, those levels see a note that the cohort opens soon, a waitlist link, the one-to-one option, and the custom-build quote. Set `visible` to `true` only after you add their `runs`.
 
-Each person pays 600 ILS. Each run holds 15 people. A run with `startDate` null shows "Starts December 2026, dates coming soon" and offers the waitlist. A sign-up button appears only after that run has a date and seats left.
+Each person pays ₪600. Each run holds 15 people. Sessions are live online via Zoom, with small hands-on breakout rooms and a private group chat between sessions. A run with `startDate` null shows "Starts December 2026, exact dates coming soon" and offers the waitlist. A sign-up button appears only after that run has a date and seats left.
 
 To open dates for a run:
 
@@ -199,7 +198,7 @@ The site is usable before these are done. Buttons that need a missing link say t
 5. Business registration number and address, on `terms.html`, once the business is registered
 6. Lawyer review of `privacy.html`, `terms.html`, and `accessibility.html` (they are marked as drafts)
 7. `features.showMicrosoftNaming`: confirm Microsoft's policy. It is on, so the approved About copy is visible. Turn it off if you must publish without Microsoft names.
-8. `features.showLetsGo` and the real `letsgo.profileUrl` after LetsGo confirms the wording
+8. LinkedIn is already set to https://www.linkedin.com/in/jordana-young. The LetsGo badge stays off the site.
 9. `booking.paymentUrl` (Grow, PayPlus, Cardcom, or similar, with Bit and cards)
 10. `booking.schedulerUrl` (Cal.com or Calendly)
 11. `booking.query` keys, if your booking tool uses different field names (for example Calendly `a1`)

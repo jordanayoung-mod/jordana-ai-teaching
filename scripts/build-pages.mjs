@@ -3,6 +3,8 @@ import path from "path";
 
 const rootDir = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const SITE = "https://jordanayoung-mod.github.io/jordana-ai-teaching";
+const LINKEDIN = "https://www.linkedin.com/in/jordana-young";
+const DISCLAIMER = "Jordana works at Microsoft on the Copilot Studio team. All courses, coaching sessions and workflow build services on this site are independent personal ventures not affiliated with, sponsored by, or endorsed by Microsoft Corporation.";
 
 const NAV = [
   ["sessions.html", "Sessions"],
@@ -33,13 +35,12 @@ function hoursTable() {
   </div>`;
 }
 
-function credStrip(h) {
+function credStrip() {
   return `<ul class="cred-strip">
-    <li data-flag="microsoft">Copilot Studio team, Microsoft</li>
+    <li>Part of the Microsoft team building Copilot Studio</li>
+    <li>20+ years shaping products and customer experiences at Microsoft, Meta, HoneyBook, and SodaStream</li>
     <li>21 published studies on AI agents</li>
-    <li data-flag="microsoft">Microsoft 2026 Innovation Catalyst Award</li>
-    <li data-flag="letsgo" hidden><a data-letsgo-href href="https://letsgo.co" target="_blank" rel="noopener noreferrer">Founding Coach at LetsGo<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-    <li>20 years of user research (Meta, SodaStream, Ipsos)</li>
+    <li>Microsoft 2026 Innovation Catalyst Award</li>
   </ul>`;
 }
 
@@ -124,6 +125,7 @@ ${body(h)}
         <p><a data-email-link data-keep-label hidden href="">Email me</a></p>
         <p data-email-missing>The public email address will appear here once it is added.</p>
         <p><a data-whatsapp-link hidden href="" target="_blank" rel="noopener noreferrer">WhatsApp<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+        <p><a href="${LINKEDIN}" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a></p>
       </div>
       <div>
         <p><strong>On this site</strong></p>
@@ -149,7 +151,7 @@ ${body(h)}
       </div>
     </div>
     <div class="wrap disclaimer">
-      <p>This is my personal business website. It is not affiliated with, sponsored or endorsed by Microsoft. Microsoft and Copilot Studio are trademarks of the Microsoft group of companies.</p>
+      <p>${DISCLAIMER}</p>
       <p>© <span data-year>2026</span> Jordana Young</p>
     </div>
   </footer>
@@ -186,9 +188,10 @@ pages.push(["index.html", {
   body: (h) => `
   <section class="hero">
     <div class="wrap">
-      <p class="kicker">One-to-one, online, in English</p>
-      <h1>Learn AI for the work you already do.</h1>
-      <p class="lede">Whether you've just opened ChatGPT or you're ready to build an agent, we'll start where you are. You bring a real task. Then we move you a couple of steps further, so you leave with something you can use again.</p>
+      <p class="kicker">Courses, coaching, and company builds</p>
+      <h1>I help shape Microsoft's AI agent builder. Now I'll help you put AI to work.</h1>
+      <p class="lede">Every engagement moves you a couple of steps further so you feel you got clear value for your money.</p>
+      <p>I'm part of the Microsoft team building Copilot Studio, with 20+ years shaping products and customer experiences at Microsoft, Meta, HoneyBook, and SodaStream.</p>
       <div class="actions">
         <a class="button button-solid" href="${h("assess.html")}">Find your level</a>
         <a class="button button-line" href="${h("sessions.html")}">See the current price</a>
@@ -205,7 +208,8 @@ pages.push(["index.html", {
     <div class="wrap">
       <div class="section-head">
         <h2 id="price-heading">The current price</h2>
-        <p>I'm releasing 40 one-to-one sessions, sold in order. The first 10 cost 400 ILS, the next 10 cost 600 ILS, then 800 ILS, then 1,200 ILS. So the price depends on how many are already sold. It doesn't depend on your level.</p>
+        <p>I'm releasing 40 private coaching sessions, sold in order. Eight cost ₪400, the next eight cost ₪600, then ₪750, then ₪950, then ₪1,200. The price depends on how many are already sold. It doesn't depend on your level.</p>
+      <p class="actions"><a class="button button-line" href="${h("sessions.html")}">See the five prices</a></p>
       </div>
       <div class="price-layout">
         ${priceCard(h, "assess.html", "Find your level")}
@@ -254,7 +258,7 @@ pages.push(["index.html", {
     <div class="wrap">
       <div class="section-head">
         <h2 id="cohorts-heading">Learn with a small group</h2>
-        <p>If you'd rather practise with other people, join a small group at your level. Beginner groups meet on Sunday or Monday evenings for three weeks. Intermediate meets on Wednesday evenings for four weeks. Each group has 15 seats at 600 ILS, and there's a group chat between sessions. This price is separate from the one-to-one sessions. December 2026 dates aren't set yet.</p>
+        <p>December 2026 has two Beginner AI Starter groups on Sunday nights, and one Intermediate AI at Work group on Wednesday nights. Each group is live online via Zoom, with small hands-on breakout rooms and a private group chat between sessions. ₪600 per person, 15 seats. Exact dates are coming soon.</p>
       </div>
       <div class="cohort-grid" data-cohort-teaser aria-busy="true"></div>
       <p class="actions"><a class="button button-solid" href="${h("cohorts.html")}">See the cohorts</a></p>
@@ -263,7 +267,7 @@ pages.push(["index.html", {
   <section class="band-dark" aria-labelledby="companies-heading">
     <div class="wrap band-inner">
       <h2 id="companies-heading">Workflow builds for companies</h2>
-      <p>I also build AI workflows for teams. A company build is quoted per project, so it doesn't use the session prices above.</p>
+      <p>I also build AI workflows for teams. The price is a quote after a 20-minute discovery call, so it doesn't use the coaching prices above.</p>
       <p>Typical work: sorting customer inquiries and drafting replies, turning meeting notes into CRM updates, or a knowledge assistant over documents your team already has.</p>
       <p class="actions"><a class="button button-light" href="${h("quote.html")}">Get a quote for a custom build</a> <a class="button button-line" href="${h("companies.html")}">See how a build runs</a></p>
     </div>
@@ -289,7 +293,7 @@ pages.push(["index.html", {
 
 pages.push(["about.html", {
   title: "About · Jordana Young",
-  description: "Jordana Young teaches people to use AI, drawing on user research and her work on Microsoft Copilot Studio.",
+  description: "Jordana Young is part of the Microsoft team building Copilot Studio. She teaches people to use AI, one to one and in small groups.",
   active: "about.html",
   body: (h) => `
   <section class="section">
@@ -301,24 +305,18 @@ pages.push(["about.html", {
       <div class="portrait" data-portrait><span class="monogram" aria-hidden="true">JY</span></div>
     </div>
     <div class="wrap" style="padding-top:1.5rem">
-      <div data-ms="on">
-        <p>Since 2024 I've been a Senior User Researcher on Microsoft Copilot Studio, the platform companies use to build their own AI agents. It serves 450,000 organisations and more than 30 million custom agents.</p>
-        <p>My job is to sit with the people building those agents, see exactly where they get stuck, and work with Copilot Studio's product, design and engineering teams to fix it. I've published 21 studies on AI agents at Microsoft, tested with builders in four countries, and received Microsoft's 2026 Innovation Catalyst Award.</p>
-        <p>So I know the exact moments where people stall with AI, and I know how to get them past those moments quickly. Before Microsoft, I spent 20 years studying how people really use products, at Meta, SodaStream (PepsiCo) and Ipsos.</p>
-      </div>
-      <div data-ms="off" hidden>
-        <p>Since 2024 I have worked as a senior user researcher on an AI agent builder used by hundreds of thousands of organisations. I sit with the people building agents, see where they get stuck, and work with product, design, and engineering teams to fix it. I have published 21 studies on AI agents, tested with builders in four countries, and received a 2026 innovation award.</p>
-        <p>So I know the exact moments where people stall with AI, and I know how to get them past those moments quickly. Before that role, I spent 20 years studying how people really use products, at Meta, SodaStream (PepsiCo) and Ipsos.</p>
-      </div>
-      <p>Whether you've never opened ChatGPT or you're ready to build your own agent, book a session and let's move you a couple of steps further.</p>
+      <p>I'm part of the Microsoft team building Copilot Studio, with 20+ years shaping products and customer experiences at Microsoft, Meta, HoneyBook, and SodaStream.</p>
+      <p>I sit with the people building AI agents, see exactly where they get stuck, and work with product, design, and engineering to fix it. I've published 21 studies on AI agents, tested with builders in four countries, and received the Microsoft 2026 Innovation Catalyst Award.</p>
+      <p>So I know the moments where people stall with AI, and I know how to get them past those moments. Every engagement moves you a couple of steps further so you feel you got clear value for your money.</p>
+      <p><a href="${LINKEDIN}" target="_blank" rel="noopener noreferrer">See my LinkedIn profile<span class="visually-hidden"> (opens in a new tab)</span></a></p>
       <h2 id="credentials">Credentials</h2>
       ${credStrip(h)}
       <h2>How I teach</h2>
       <p>I meet you where you are. We pick one or two goals tied to a real task, and you do the hands-on work while I guide you. You leave with an artifact, such as a prompt you can reuse, a custom assistant, or a workflow, plus a short plan for what to do next.</p>
-      <p>Sessions are live and one to one, online. The booking page shows the length and the video link.</p>
-      <p class="actions"><a class="button button-solid" href="${h("assess.html")}">Find your level</a></p>
+      <p>Coaching is live and one to one, online. Cohorts are live on Zoom, in small breakout rooms, with a private group chat between sessions.</p>
+      <p class="actions"><a class="button button-solid" href="${h("assess.html")}">Find your level</a> <a class="button button-line" href="${h("cohorts.html")}">See December groups</a></p>
       <div class="note" style="padding:1rem;margin-top:1rem">
-        <p>This is my personal business website. It is not affiliated with, sponsored or endorsed by Microsoft. Microsoft and Copilot Studio are trademarks of the Microsoft group of companies.</p>
+        <p>${DISCLAIMER}</p>
       </div>
     </div>
   </section>`
@@ -326,7 +324,7 @@ pages.push(["about.html", {
 
 pages.push(["sessions.html", {
   title: "Sessions and pricing · Jordana Young",
-  description: "40 one-to-one AI sessions, sold in order: 400, 600, 800, then 1,200 ILS. Your level doesn't change the price.",
+  description: "40 private coaching sessions, sold in order: ₪400, ₪600, ₪750, ₪950, then ₪1,200. Eight seats at each price.",
   active: "sessions.html",
   body: (h) => `
   <section class="section">
@@ -337,7 +335,7 @@ pages.push(["sessions.html", {
       <div class="price-layout">
         ${priceCard(h, "assess.html", "Find your level, then book")}
         <div>
-          <h2>The four price steps</h2>
+          <h2>The five price steps</h2>
           <ol class="ladder" data-price-ladder></ol>
           <p class="muted" data-vat-note>Prices are in Israeli shekels (ILS). The figure on the payment page is the figure you pay.</p>
         </div>
@@ -506,16 +504,16 @@ pages.push(["results.html", {
 
 pages.push(["cohorts.html", {
   title: "Group cohorts · Jordana Young",
-  description: "December 2026 cohorts: Beginner on Sunday or Monday evenings, Intermediate on Wednesday evenings. 600 ILS, 15 seats.",
+  description: "December 2026: two Beginner AI Starter groups on Sunday nights, and one Intermediate AI at Work group on Wednesday nights. ₪600, 15 seats.",
   active: "cohorts.html",
   scripts: ["js/cohorts.js"],
   body: (h) => `
   <section class="section">
     <div class="wrap">
       <p class="kicker">Cohorts</p>
-      <h1>Pick a night, then learn with a small group.</h1>
-      <p class="lede">From December 2026 there are three Beginner groups and one Intermediate group. Beginner meets on the same evening for three weeks: Sunday, or one of two Monday times. The first two sessions are 90 minutes. The length of the third isn't set yet. Intermediate meets on Wednesday evenings for four weeks, 90 minutes each time. Every group has 15 seats at 600 ILS. There's a group chat between sessions. This price isn't the one-to-one ladder.</p>
-      <p>Course names and the session topics below are placeholders. I'm still writing the curriculum, and I'll replace them before a group opens. Exact December dates and start times aren't set yet.</p>
+      <h1>Sunday starters, and a Wednesday group for work.</h1>
+      <p class="lede">December 2026 has two Beginner AI Starter cohorts on Sunday nights, and one Intermediate AI at Work cohort on Wednesday nights. Sessions are live online via Zoom, with small hands-on breakout rooms and a private group chat between sessions. ₪600 per person, 15 seats in each group.</p>
+      <p>Beginner is three weekly sessions: 90 minutes, 90 minutes, then a 60-minute live clinic and wrap-up. Intermediate is four weekly 90-minute sessions. Exact dates are coming soon. Advanced and Expert groups open in Q1 2027.</p>
       <div class="cohort-grid" data-cohort-list aria-busy="true"></div>
       <noscript><p>JavaScript is off, so the seat count can't load. Use the form below, or the contact page, and tell me your level.</p></noscript>
     </div>
@@ -544,12 +542,11 @@ pages.push(["cohorts.html", {
         <div class="field"><label for="cohort-run">Group</label>
           <select id="cohort-run" name="runId">
             <option value="">I'm flexible</option>
-            <option value="beginner-sunday">Beginner, Sunday cohort</option>
-            <option value="beginner-monday-a">Beginner, Monday cohort A</option>
-            <option value="beginner-monday-b">Beginner, Monday cohort B</option>
+            <option value="beginner-sunday-a">Beginner, Sunday cohort A</option>
+            <option value="beginner-sunday-b">Beginner, Sunday cohort B</option>
             <option value="intermediate-wednesday">Intermediate, Wednesday cohort</option>
           </select>
-          <span class="hint">Monday cohort A and Monday cohort B are two different time slots. The clocks aren't set yet.</span>
+          <span class="hint">The two Sunday groups are separate. Start times aren't set yet.</span>
         </div>
         <div class="field"><label for="cohort-path">Preferred path</label>
           <select id="cohort-path" name="path">
@@ -804,7 +801,8 @@ pages.push(["companies.html", {
       <h1><span data-ms="on">I help shape Microsoft's AI agent builder. Now I'll help you put AI to work.</span><span data-ms="off" hidden>I study how people get stuck with a process. Then I help you automate the right part of it.</span></h1>
       <p data-ms="on">So I know the exact moments where people stall with AI, and I know how to get them past those moments quickly.</p>
       <p data-ms="off" hidden>I spend my research time watching where a workflow breaks, then I help a team get past that point.</p>
-      <p>This page is for a company build. It is quoted per project. It doesn't use the 40-session prices.</p>
+      <p>A company build is priced by quote after a 20-minute discovery call. It doesn't use the coaching prices or the ₪600 cohort price.</p>
+      <p><a href="${LINKEDIN}" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a></p>
       <p class="actions"><a class="button button-light" href="${h("quote.html")}">Get a quote for a custom build</a></p>
     </div>
   </section>
@@ -824,14 +822,15 @@ pages.push(["companies.html", {
       </div>
       <h2>How a build runs</h2>
       <ol class="check">
-        <li>Discovery call, so I can see the process and the constraint.</li>
+        <li>A 20-minute discovery call, so I can see the process and the constraint. The quote comes after that call.</li>
         <li>Scoping and a written proposal.</li>
         <li>Build.</li>
         <li>Testing with your team.</li>
         <li>Handover and training.</li>
         <li>Optional support after that.</li>
       </ol>
-      <p>A discovery call can go on the same calendar as teaching sessions, but it doesn't use one of the 40 session places.</p>
+      <p>The 20-minute discovery call can go on the same calendar as coaching, but it doesn't use one of the 40 session places.</p>
+      <p class="actions"><a class="button button-line" href="${h("quote.html")}">Request the discovery call</a></p>
       <h2>What you need to provide</h2>
       <p>A person who knows the process, sample inputs that are safe to share, and access to the tools we connect. I will ask what must never be sent to an AI tool before anything is built.</p>
       <h2>Questions that usually come up</h2>
@@ -841,6 +840,9 @@ pages.push(["companies.html", {
         <details><summary>What about our data?</summary><p>We use non-sensitive samples while building. Live customer data, secrets, and regulated data stay out unless we have agreed a specific control and your own policy allows it.</p></details>
       </div>
       <p class="actions"><a class="button button-accent" href="${h("quote.html")}">Get a quote for a custom build</a></p>
+      <div class="note" style="padding:1rem;margin-top:1rem">
+        <p>${DISCLAIMER}</p>
+      </div>
     </div>
   </section>`
 }]);
@@ -854,7 +856,7 @@ pages.push(["quote.html", {
     <div class="wrap-narrow">
       <p class="kicker">Companies</p>
       <h1>Get a quote for a custom build</h1>
-      <p class="lede">Tell me the process, the tools, and the rough timing. I will reply with what happens next. This is not a session booking, and it doesn't use the 40-session prices.</p>
+      <p class="lede">Tell me the process, the tools, and the rough timing. The price is a quote after a 20-minute discovery call. This isn't a coaching booking, and it doesn't use the 40-session prices.</p>
       <form class="form-card" data-endpoint="quote" data-success="Thank you. I have the request. I will reply with the next step and a realistic time to hear back. If you want a short discovery call, say so in the description and I will send times." data-unconfigured="The quote form is not connected yet. Please use the contact page and include the word quote, your company, and the process you want to change." novalidate>
         ${alertBox()}
         ${honeypot("quote-hp")}
@@ -965,8 +967,8 @@ pages.push(["faq.html", {
       <p class="kicker">FAQ</p>
       <h1>Questions before you book</h1>
       <div class="faq">
-        <details open><summary>Does my level change the one-to-one price?</summary><p>No. Everyone in this release pays the price that's open when they pay: 400 ILS for the first 10 sessions, then 600, then 800, then 1,200. The questionnaire changes your prep and what we work on. <a href="${h("sessions.html")}">See the current price</a>.</p></details>
-        <details><summary>What's a cohort?</summary><p>A small online group at one level. Beginner is three evenings on the same night (Sunday, or one of two Monday times). The first two sessions are 90 minutes, and the third length isn't set yet. Intermediate is four Wednesday evenings, 90 minutes each. It's 600 ILS per person, with 15 seats. December dates aren't set, so <a href="${h("cohorts.html")}">join the waitlist</a> and you'll hear first.</p></details>
+        <details open><summary>Does my level change the one-to-one price?</summary><p>No. Everyone pays the price that's open when they pay: eight sessions at ₪400, then eight at ₪600, then ₪750, then ₪950, then ₪1,200. The questionnaire changes your prep and what we work on. <a href="${h("sessions.html")}">See the current price</a>.</p></details>
+        <details><summary>What's a cohort?</summary><p>A small group, live on Zoom, with breakout rooms and a private group chat. December 2026 has two Beginner groups on Sunday nights (three sessions: 90, 90, then a 60-minute clinic) and one Intermediate group on Wednesday nights (four weekly 90-minute sessions). ₪600 per person, 15 seats. Exact dates are coming soon, so <a href="${h("cohorts.html")}">join the waitlist</a>.</p></details>
         <details><summary>Which level am I?</summary><p>Answer the 12 questions. The score maps to Beginner, Intermediate, Advanced, or Expert. If you haven't tried an AI tool yet, the result stays at Beginner. <a href="${h("assess.html")}">Find your level</a>.</p></details>
         <details><summary>What tools do I need?</summary><p>A laptop, a video call that can share a screen, and an AI account. Beginners can use a free ChatGPT or Claude account. Other levels bring the tools they already use. Each <a href="${h("after-booking.html")}">prep page</a> lists the exact setup.</p></details>
         <details><summary>What language is the session?</summary><p>English. The site, the forms, and the session are in English.</p></details>
@@ -1106,7 +1108,7 @@ pages.push(["terms.html", {
       <p>I sell live, one-to-one, online teaching sessions in English, small-group cohorts, and, separately, custom workflow builds for companies. A one-to-one place, a cohort seat, and a company quote are different offers. Company work isn't sold from the 40-session inventory.</p>
       <h2>Price</h2>
       <p data-vat-note>Prices are in Israeli shekels (ILS). The figure on the payment page is the figure you pay.</p>
-      <p>One-to-one prices step up as places sell: 10 sessions at 400 ILS, then 10 at 600 ILS, then 10 at 800 ILS, then 10 at 1,200 ILS. You pay the step that's open when the payment succeeds. Your level doesn't change that price. A cohort seat is 600 ILS per person, with a maximum of 15 people, and it doesn't use those 40 places.</p>
+      <p>Private coaching prices step up as places sell: 8 sessions at ₪400, then 8 at ₪600, then 8 at ₪750, then 8 at ₪950, then 8 at ₪1,200. You pay the step that's open when the payment succeeds. Your level doesn't change that price. A cohort seat is ₪600 per person, with a maximum of 15 people, and it doesn't use those 40 places.</p>
       <h2>How a booking is confirmed</h2>
       <p>You pay first. A time is confirmed when the booking tool accepts it after payment. Unpaid holds are not a confirmed session. The seller is Jordana Young. A business registration number and address will be added here once the business is registered.</p>
       <h2>Cancellation and refunds</h2>
