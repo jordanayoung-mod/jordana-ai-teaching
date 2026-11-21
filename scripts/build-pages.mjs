@@ -6,6 +6,7 @@ const SITE = "https://jordanayoung-mod.github.io/jordana-ai-teaching";
 
 const NAV = [
   ["sessions.html", "Sessions"],
+  ["cohorts.html", "Cohorts"],
   ["how-it-works.html", "How it works"],
   ["about.html", "About"],
   ["companies.html", "For companies"],
@@ -128,6 +129,7 @@ ${body(h)}
         <p><strong>On this site</strong></p>
         <ul class="footer-links">
           <li><a href="${h("sessions.html")}">Sessions and pricing</a></li>
+          <li><a href="${h("cohorts.html")}">Group cohorts</a></li>
           <li><a href="${h("how-it-works.html")}">How it works</a></li>
           <li><a href="${h("after-booking.html")}">After you book</a></li>
           <li><a href="${h("companies.html")}">Workflow builds for companies</a></li>
@@ -177,15 +179,16 @@ function write(file, opts) {
 const pages = [];
 
 pages.push(["index.html", {
-  title: "Jordana Young · One-to-one AI sessions",
-  description: "One-to-one online sessions that help you use AI on a real task. 40 sessions, sold in order, from 400 ILS.",
+  title: "Jordana Young · One-to-one AI sessions and group cohorts",
+  description: "One-to-one AI sessions and small-group cohorts, online in English. Find your level, then book a session or join a December group.",
   active: "",
+  scripts: ["js/cohorts.js"],
   body: (h) => `
   <section class="hero">
     <div class="wrap">
       <p class="kicker">One-to-one, online, in English</p>
       <h1>Learn AI for the work you already do.</h1>
-      <p class="lede">I teach people who want to use AI, from a first ChatGPT account to building an agent. You bring a real task. Then we move you a couple of steps further, so you leave with something you can use again.</p>
+      <p class="lede">Whether you've just opened ChatGPT or you're ready to build an agent, we'll start where you are. You bring a real task. Then we move you a couple of steps further, so you leave with something you can use again.</p>
       <div class="actions">
         <a class="button button-solid" href="${h("assess.html")}">Find your level</a>
         <a class="button button-line" href="${h("sessions.html")}">See the current price</a>
@@ -202,7 +205,7 @@ pages.push(["index.html", {
     <div class="wrap">
       <div class="section-head">
         <h2 id="price-heading">The current price</h2>
-        <p>I am releasing 40 single sessions, sold in order. The first 10 cost 400 ILS, the next 10 cost 600 ILS, then 800 ILS, then 1,200 ILS. So the price depends on how many are already sold. It does not depend on your level.</p>
+        <p>I'm releasing 40 one-to-one sessions, sold in order. The first 10 cost 400 ILS, the next 10 cost 600 ILS, then 800 ILS, then 1,200 ILS. So the price depends on how many are already sold. It doesn't depend on your level.</p>
       </div>
       <div class="price-layout">
         ${priceCard(h, "assess.html", "Find your level")}
@@ -247,10 +250,20 @@ pages.push(["index.html", {
       <p class="actions"><a class="button button-solid" href="${h("assess.html")}">Find your level</a></p>
     </div>
   </section>
+  <section class="section" aria-labelledby="cohorts-heading">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="cohorts-heading">Learn with a small group</h2>
+        <p>If you'd rather practise with other people, join a small group at your level. Beginner groups meet on Sunday or Monday evenings for three weeks. Intermediate meets on Wednesday evenings for four weeks. Each group has 15 seats at 600 ILS, and there's a group chat between sessions. This price is separate from the one-to-one sessions. December 2026 dates aren't set yet.</p>
+      </div>
+      <div class="cohort-grid" data-cohort-teaser aria-busy="true"></div>
+      <p class="actions"><a class="button button-solid" href="${h("cohorts.html")}">See the cohorts</a></p>
+    </div>
+  </section>
   <section class="band-dark" aria-labelledby="companies-heading">
     <div class="wrap band-inner">
       <h2 id="companies-heading">Workflow builds for companies</h2>
-      <p>I also build AI workflows for teams. A company build is quoted per project, so it does not use the session prices above.</p>
+      <p>I also build AI workflows for teams. A company build is quoted per project, so it doesn't use the session prices above.</p>
       <p>Typical work: sorting customer inquiries and drafting replies, turning meeting notes into CRM updates, or a knowledge assistant over documents your team already has.</p>
       <p class="actions"><a class="button button-light" href="${h("quote.html")}">Get a quote for a custom build</a> <a class="button button-line" href="${h("companies.html")}">See how a build runs</a></p>
     </div>
@@ -259,7 +272,7 @@ pages.push(["index.html", {
     <div class="wrap">
       <div class="section-head">
         <h2 id="reviews-heading">Reviews</h2>
-        <p>I publish a review only after I have read it, and only if you agreed to that. I do not change your words.</p>
+        <p>I publish a review only after I have read it, and only if you agreed to that. I don't change your words.</p>
       </div>
       <div data-reviews></div>
       <p class="actions"><a href="${h("review.html")}">Leave a review</a></p>
@@ -313,14 +326,14 @@ pages.push(["about.html", {
 
 pages.push(["sessions.html", {
   title: "Sessions and pricing · Jordana Young",
-  description: "40 one-to-one AI sessions, sold in order: 400, 600, 800, then 1,200 ILS. Your level does not change the price.",
+  description: "40 one-to-one AI sessions, sold in order: 400, 600, 800, then 1,200 ILS. Your level doesn't change the price.",
   active: "sessions.html",
   body: (h) => `
   <section class="section">
     <div class="wrap">
       <p class="kicker">Sessions</p>
       <h1>One session. The price steps up as places sell.</h1>
-      <p class="lede">Each booking is a single live session. There are 40 in this release. They sell in order, so early bookings pay less. Your questionnaire level changes the prep and the work we do. It does not change the price.</p>
+      <p class="lede">Each booking is a single live session. There are 40 in this release. They sell in order, so earlier bookings pay less. Your level changes the prep and the work we do. It doesn't change the price.</p>
       <div class="price-layout">
         ${priceCard(h, "assess.html", "Find your level, then book")}
         <div>
@@ -342,7 +355,7 @@ pages.push(["sessions.html", {
         <li>A calendar invite on my Google Calendar, with your name and level in the title once the booking tool is connected.</li>
         <li>Payment in ILS by credit card or Bit, on the payment provider's page. Then you choose the time.</li>
       </ul>
-      <p>The booking page shows how long the session is. There is a short gap after each one so sessions do not run into each other.</p>
+      <p>The booking page shows how long the session is. There is a short gap after each one so sessions don't run into each other.</p>
       <h2>How the level changes the session</h2>
       <div class="level-grid">
         <article class="level-card"><h3>Beginner</h3><p>New or occasional. We set up an account and get a first useful result on an everyday task.</p><p><a href="${h("prep/beginner.html")}">Beginner prep</a></p></article>
@@ -366,7 +379,7 @@ pages.push(["how-it-works.html", {
     <div class="wrap-narrow">
       <p class="kicker">How it works</p>
       <h1>Pay first. Then choose a time.</h1>
-      <p class="lede">The questionnaire tells us your level. The price is whatever step is open when you pay. After payment, you pick a slot and the time goes onto my Google Calendar.</p>
+      <p class="lede">The questionnaire tells us your level. You pay the step that's open, then you pick a time. That time goes straight onto my Google Calendar.</p>
       <h2>The steps</h2>
       <ol class="check">
         <li>You leave your name, email, and phone, and you choose whether I may send marketing messages. Service messages about your booking are separate.</li>
@@ -382,7 +395,7 @@ pages.push(["how-it-works.html", {
       ${hoursTable()}
       <p>Friday and Saturday are closed. Lunch is blocked every open day, so a session cannot overlap 12:00 to 12:30. Monday afternoons are also blocked from 16:30 to 18:30.</p>
       <h2>Google Calendar</h2>
-      <p>When a booking is confirmed, it is added to my Google Calendar. Busy times on that calendar are blocked on the booking page, including sessions booked through other tools, so we do not double-book. A reschedule moves the event. A cancellation clears it. I connect the calendar inside the booking tool (Cal.com or Calendly).</p>
+      <p>When a booking is confirmed, it is added to my Google Calendar. Busy times on that calendar are blocked on the booking page, including sessions booked through other tools, so we don't double-book. A reschedule moves the event. A cancellation clears it. I connect the calendar inside the booking tool (Cal.com or Calendly).</p>
       <p class="actions"><a class="button button-line" href="${h("book.html")}">Go to book and pay</a> <a class="button button-line" href="${h("after-booking.html")}">See what happens after you book</a></p>
     </div>
   </section>`
@@ -398,7 +411,7 @@ pages.push(["assess.html", {
     <div class="wrap-narrow">
       <p class="kicker">Questionnaire</p>
       <h1>Find your level</h1>
-      <p class="lede">First I need a way to reach you. Then there are 12 questions. Most people finish in under 4 minutes. The result is a level and a path. The price stays the current session price.</p>
+      <p class="lede">First I need a way to reach you. Then there are 12 short questions. Most people finish in under 4 minutes. You'll see a level and a path. The one-to-one price stays whatever step is open.</p>
       <form id="lead-form" novalidate>
         <p class="hint">Required fields are marked. The marketing box is optional and starts unticked.</p>
         ${alertBox()}
@@ -463,28 +476,103 @@ pages.push(["results.html", {
         <p><a class="button button-solid" href="${h("assess.html")}">Find your level</a></p>
       </div>
       <div id="result" hidden>
-        <p class="kicker">Your recommendation</p>
-        <h1 id="result-level">Level</h1>
-        <p id="result-score"></p>
+        <p class="kicker">Your result</p>
+        <h1 id="result-level">Your level</h1>
         <p id="result-summary" class="lede"></p>
+        <p id="result-score"></p>
         <p id="result-adjust" hidden></p>
         <h2>Learning path: <span id="result-path"></span></h2>
         <p id="result-path-summary"></p>
-        <p>The price is the same at every level. It is the step that is open right now.</p>
-        <div class="price-layout">
-          ${priceCard(h, "book.html", "Book and pay")}
-          <div>
-            <p>Book and pay opens the payment page, then the booking page. Your name, email, and level are added to those links.</p>
-            <p><a id="result-prep" href="${h("prep/beginner.html")}">Read the prep for this level</a></p>
-            <p><a href="${h("after-booking.html")}">See what happens after you book</a></p>
-          </div>
-        </div>
+        <h2>By the end of this course you will…</h2>
+        <ul id="result-outcomes" class="check"></ul>
+        <section id="cohort-offer" aria-live="polite">
+          <h2>The next groups</h2>
+          <div id="cohort-offer-body"><p>Loading the groups for your level.</p></div>
+        </section>
+        <aside id="session-cta" class="quiet-offer">
+          <h2>Prefer a one-to-one session?</h2>
+          <p>That's a single live session at the current price. It's separate from the cohort, and your level doesn't change that price.</p>
+          <p class="actions"><a class="button button-line" href="${h("book.html")}">Book a one-to-one session</a> <a id="result-prep" href="${h("prep/beginner.html")}">Read the prep for this level</a></p>
+        </aside>
         <aside id="company-cta" class="note" style="padding:1rem;margin-top:1.2rem" hidden>
           <h2>Building this for a team?</h2>
-          <p>A workflow for a company is a separate quote. It does not use this session price.</p>
+          <p>A workflow for a company is a separate quote. It doesn't use this session price, or the cohort price.</p>
           <p><a class="button button-accent" href="${h("quote.html")}">Get a quote for a custom build</a></p>
         </aside>
       </div>
+    </div>
+  </section>`
+}]);
+
+pages.push(["cohorts.html", {
+  title: "Group cohorts · Jordana Young",
+  description: "December 2026 cohorts: Beginner on Sunday or Monday evenings, Intermediate on Wednesday evenings. 600 ILS, 15 seats.",
+  active: "cohorts.html",
+  scripts: ["js/cohorts.js"],
+  body: (h) => `
+  <section class="section">
+    <div class="wrap">
+      <p class="kicker">Cohorts</p>
+      <h1>Pick a night, then learn with a small group.</h1>
+      <p class="lede">From December 2026 there are three Beginner groups and one Intermediate group. Beginner meets on the same evening for three weeks: Sunday, or one of two Monday times. The first two sessions are 90 minutes. The length of the third isn't set yet. Intermediate meets on Wednesday evenings for four weeks, 90 minutes each time. Every group has 15 seats at 600 ILS. There's a group chat between sessions. This price isn't the one-to-one ladder.</p>
+      <p>Course names and the session topics below are placeholders. I'm still writing the curriculum, and I'll replace them before a group opens. Exact December dates and start times aren't set yet.</p>
+      <div class="cohort-grid" data-cohort-list aria-busy="true"></div>
+      <noscript><p>JavaScript is off, so the seat count can't load. Use the form below, or the contact page, and tell me your level.</p></noscript>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0" aria-labelledby="cohort-waitlist">
+    <div class="wrap-narrow">
+      <h2 id="cohort-waitlist">Join the waitlist</h2>
+      <p>Use this if a cohort is full, or if the next date isn't set yet. I'll email you about that cohort. Other notes only go out if you tick the optional box.</p>
+      <p id="cohort-prefill" class="hint" hidden></p>
+      <form id="cohort-waitlist-form" class="form-card" data-endpoint="cohortWaitlist" data-success="You're on the waitlist. I'll email you when a date is set or a seat opens for this level. I'll only send other notes if you ticked the optional box." data-unconfigured="The cohort waitlist isn't connected yet. Please use the contact page, name the level, and I'll add you by hand." novalidate>
+        ${alertBox()}
+        ${honeypot("cohort-hp")}
+        <div class="field"><label for="cohort-name">Name (required)</label><input id="cohort-name" name="name" autocomplete="name" required><span class="field-error" data-error-for="name"></span></div>
+        <div class="field"><label for="cohort-email">Email (required)</label><input id="cohort-email" name="email" type="email" autocomplete="email" inputmode="email" required><span class="field-error" data-error-for="email"></span></div>
+        <div class="field"><label for="cohort-phone">Phone (optional)</label><input id="cohort-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"><span class="hint">Include the country code if you add a number, for example +972.</span></div>
+        <div class="field"><label for="cohort-level">Level (required)</label>
+          <select id="cohort-level" name="level" required>
+            <option value="">Choose one</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced (opens later)</option>
+            <option value="expert">Expert (opens later)</option>
+          </select>
+          <span class="field-error" data-error-for="level"></span>
+        </div>
+        <div class="field"><label for="cohort-run">Group</label>
+          <select id="cohort-run" name="runId">
+            <option value="">I'm flexible</option>
+            <option value="beginner-sunday">Beginner, Sunday cohort</option>
+            <option value="beginner-monday-a">Beginner, Monday cohort A</option>
+            <option value="beginner-monday-b">Beginner, Monday cohort B</option>
+            <option value="intermediate-wednesday">Intermediate, Wednesday cohort</option>
+          </select>
+          <span class="hint">Monday cohort A and Monday cohort B are two different time slots. The clocks aren't set yet.</span>
+        </div>
+        <div class="field"><label for="cohort-path">Preferred path</label>
+          <select id="cohort-path" name="path">
+            <option value="">Not sure yet</option>
+            <option value="work">Work productivity</option>
+            <option value="writing">Writing</option>
+            <option value="research">Research</option>
+            <option value="images">Images</option>
+            <option value="agents">Agents and automation</option>
+            <option value="home">AI at home</option>
+          </select>
+        </div>
+        <div class="choice">
+          <input id="cohort-privacy" name="privacyConsent" type="checkbox" value="yes" required>
+          <label for="cohort-privacy">I have read the <a href="${h("privacy.html")}">Privacy Policy</a> and I agree to be contacted about this cohort. (required)</label>
+        </div>
+        <span class="field-error" data-error-for="privacyConsent"></span>
+        <div class="choice">
+          <input id="cohort-marketing" name="marketingConsent" type="checkbox" value="yes">
+          <label for="cohort-marketing">You may send me occasional tips and offers by email or WhatsApp. This is optional, and I can opt out at any time.</label>
+        </div>
+        <button class="button button-solid" type="submit">Join the waitlist</button>
+      </form>
     </div>
   </section>`
 }]);
@@ -499,14 +587,14 @@ pages.push(["book.html", {
     <div class="wrap-narrow">
       <p class="kicker">Book</p>
       <h1>Book and pay</h1>
-      <p class="lede">Pay first, on the payment provider's page. Then choose a time. I do not store your card number.</p>
+      <p class="lede">Pay first, on the payment provider's page. Then choose a time. I don't store your card number.</p>
       <div data-when="soldout" hidden>
         <p>All 40 sessions in this release are sold, so booking is closed until the next release.</p>
         <p><a class="button button-solid" href="${h("waitlist.html")}">Join the waitlist</a></p>
       </div>
       <div data-when="available">
         <div id="book-gate">
-          <p>If you have not done the questionnaire in this browser, add your details here so the booking link can carry your name and level.</p>
+          <p>If you haven't done the questionnaire in this browser, add your details here so the booking link can carry your name and level.</p>
           <form id="book-gate-form" class="form-card" novalidate>
             ${alertBox()}
             <div class="field"><label for="firstName">First name (required)</label><input id="firstName" name="firstName" autocomplete="given-name" required><span class="field-error" data-error-for="firstName"></span></div>
@@ -559,7 +647,7 @@ pages.push(["after-booking.html", {
     <div class="wrap-narrow">
       <p class="kicker">After booking</p>
       <h1>What happens after you book</h1>
-      <p class="lede">You will have paid, chosen a time, and received a video link. Do the prep for your level before we meet, so the session can start on your task.</p>
+      <p class="lede">Once you've paid and chosen a time, you'll have a video link. Do the prep for your level before we meet, so we can start on your task.</p>
       <ol class="check">
         <li>You pay on the provider's page and keep the confirmation. A formal Israeli receipt or tax invoice is emailed once the invoicing tool is connected.</li>
         <li>You choose a time. Bookings open the week of Sunday 29 November 2026, Sunday to Thursday, 11:00 to 20:00 Israel time, with lunch 12:00 to 12:30 and Mondays also blocked 16:30 to 18:30.</li>
@@ -610,13 +698,13 @@ function prep({ slug, label, intro, items, reading }) {
 prep({
   slug: "beginner",
   label: "Beginner",
-  intro: "Do these three things before we meet, so we do not spend the session creating an account or testing the video call.",
+  intro: "Do these three things before we meet, so we don't spend the session creating an account or testing the video call.",
   items: [
     "Create a free ChatGPT or Claude account, and log in on the device you will use in the session.",
     "Check that video calls and screen sharing work on that device.",
     "Write down 2 or 3 everyday tasks you would like help with."
   ],
-  reading: `<p>AI tools predict a likely next answer from your prompt and from patterns in their training. They are useful for drafts, lists, explanations, and first versions. They can also be confidently wrong, so we will check anything that matters. You do not need to memorise how the model works before we meet.</p>`
+  reading: `<p>AI tools predict a likely next answer from your prompt and from patterns in their training. They are useful for drafts, lists, explanations, and first versions. They can also be confidently wrong, so we will check anything that matters. You don't need to memorise how the model works before we meet.</p>`
 });
 
 prep({
@@ -641,7 +729,7 @@ prep({
     "Prepare one concrete workflow or use case to build or improve in the session.",
     "Share sample inputs ahead if you can, through the goals form. Keep them non-confidential."
   ],
-  reading: `<p>A custom assistant is a saved set of instructions, plus any files or tools you attach, so you do not re-explain the job every time. We will decide what the assistant must do, what it must refuse, and how you will check its output.</p>`
+  reading: `<p>A custom assistant is a saved set of instructions, plus any files or tools you attach, so you don't re-explain the job every time. We will decide what the assistant must do, what it must refuse, and how you will check its output.</p>`
 });
 
 prep({
@@ -716,7 +804,7 @@ pages.push(["companies.html", {
       <h1><span data-ms="on">I help shape Microsoft's AI agent builder. Now I'll help you put AI to work.</span><span data-ms="off" hidden>I study how people get stuck with a process. Then I help you automate the right part of it.</span></h1>
       <p data-ms="on">So I know the exact moments where people stall with AI, and I know how to get them past those moments quickly.</p>
       <p data-ms="off" hidden>I spend my research time watching where a workflow breaks, then I help a team get past that point.</p>
-      <p>This page is for a company build. It is quoted per project. It does not use the 40-session prices.</p>
+      <p>This page is for a company build. It is quoted per project. It doesn't use the 40-session prices.</p>
       <p class="actions"><a class="button button-light" href="${h("quote.html")}">Get a quote for a custom build</a></p>
     </div>
   </section>
@@ -732,7 +820,7 @@ pages.push(["companies.html", {
         <article class="use-card"><h3>Knowledge assistant</h3><p>Answers drawn from documents your team already trusts, with a way to check the source.</p></article>
         <article class="use-card"><h3>Reports</h3><p>A first draft of a summary or a status report from material you provide.</p></article>
         <article class="use-card"><h3>Lead qualification</h3><p>A first pass on incoming leads, with the rules your team already uses.</p></article>
-        <article class="use-card"><h3>Onboarding</h3><p>Checklists and reminders so a new person, or a new client, does not depend on memory.</p></article>
+        <article class="use-card"><h3>Onboarding</h3><p>Checklists and reminders so a new person, or a new client, doesn't depend on memory.</p></article>
       </div>
       <h2>How a build runs</h2>
       <ol class="check">
@@ -743,7 +831,7 @@ pages.push(["companies.html", {
         <li>Handover and training.</li>
         <li>Optional support after that.</li>
       </ol>
-      <p>A discovery call can go on the same calendar as teaching sessions, but it does not use one of the 40 session places.</p>
+      <p>A discovery call can go on the same calendar as teaching sessions, but it doesn't use one of the 40 session places.</p>
       <h2>What you need to provide</h2>
       <p>A person who knows the process, sample inputs that are safe to share, and access to the tools we connect. I will ask what must never be sent to an AI tool before anything is built.</p>
       <h2>Questions that usually come up</h2>
@@ -766,7 +854,7 @@ pages.push(["quote.html", {
     <div class="wrap-narrow">
       <p class="kicker">Companies</p>
       <h1>Get a quote for a custom build</h1>
-      <p class="lede">Tell me the process, the tools, and the rough timing. I will reply with what happens next. This is not a session booking, and it does not use the 40-session prices.</p>
+      <p class="lede">Tell me the process, the tools, and the rough timing. I will reply with what happens next. This is not a session booking, and it doesn't use the 40-session prices.</p>
       <form class="form-card" data-endpoint="quote" data-success="Thank you. I have the request. I will reply with the next step and a realistic time to hear back. If you want a short discovery call, say so in the description and I will send times." data-unconfigured="The quote form is not connected yet. Please use the contact page and include the word quote, your company, and the process you want to change." novalidate>
         ${alertBox()}
         ${honeypot("quote-hp")}
@@ -817,7 +905,7 @@ pages.push(["reviews.html", {
     <div class="wrap">
       <p class="kicker">Reviews</p>
       <h1>What students say</h1>
-      <p class="lede">A review is published here only if you agreed, and only after I have read it. I do not rewrite your words. I decline a review only for a clear reason, such as abuse, personal data, spam, or a note that did not come from a session.</p>
+      <p class="lede">A review is published here only if you agreed, and only after I have read it. I don't rewrite your words. I decline a review only for a clear reason, such as abuse, personal data, spam, or a note that did not come from a session.</p>
       <div data-reviews></div>
       <p class="actions"><a class="button button-solid" href="${h("review.html")}">Leave a review</a></p>
     </div>
@@ -877,18 +965,19 @@ pages.push(["faq.html", {
       <p class="kicker">FAQ</p>
       <h1>Questions before you book</h1>
       <div class="faq">
-        <details open><summary>Does my level change the price?</summary><p>No. Everyone in this release pays the price that is open when they pay: 400 ILS for the first 10 sessions, then 600, then 800, then 1,200. The questionnaire changes your prep and what we work on. <a href="${h("sessions.html")}">See the current price</a>.</p></details>
-        <details><summary>Which level am I?</summary><p>Answer the 12 questions. The score maps to Beginner, Intermediate, Advanced, or Expert. If you have never used an AI tool, the result stays at Beginner. <a href="${h("assess.html")}">Find your level</a>.</p></details>
+        <details open><summary>Does my level change the one-to-one price?</summary><p>No. Everyone in this release pays the price that's open when they pay: 400 ILS for the first 10 sessions, then 600, then 800, then 1,200. The questionnaire changes your prep and what we work on. <a href="${h("sessions.html")}">See the current price</a>.</p></details>
+        <details><summary>What's a cohort?</summary><p>A small online group at one level. Beginner is three evenings on the same night (Sunday, or one of two Monday times). The first two sessions are 90 minutes, and the third length isn't set yet. Intermediate is four Wednesday evenings, 90 minutes each. It's 600 ILS per person, with 15 seats. December dates aren't set, so <a href="${h("cohorts.html")}">join the waitlist</a> and you'll hear first.</p></details>
+        <details><summary>Which level am I?</summary><p>Answer the 12 questions. The score maps to Beginner, Intermediate, Advanced, or Expert. If you haven't tried an AI tool yet, the result stays at Beginner. <a href="${h("assess.html")}">Find your level</a>.</p></details>
         <details><summary>What tools do I need?</summary><p>A laptop, a video call that can share a screen, and an AI account. Beginners can use a free ChatGPT or Claude account. Other levels bring the tools they already use. Each <a href="${h("after-booking.html")}">prep page</a> lists the exact setup.</p></details>
         <details><summary>What language is the session?</summary><p>English. The site, the forms, and the session are in English.</p></details>
         <details><summary>Is it online or in person?</summary><p>Online, one to one. The video link is in the calendar invite. Zoom, Google Meet, or Teams is set in the booking tool.</p></details>
-        <details><summary>How do I pay?</summary><p>You pay first, in Israeli shekels, on a page run by an Israeli payment provider. Credit cards and Bit are the intended methods. Then you choose a time. This website does not see your card number. <a href="${h("book.html")}">Book and pay</a>.</p></details>
+        <details><summary>How do I pay?</summary><p>You pay first, in Israeli shekels, on a page run by an Israeli payment provider. Credit cards and Bit are the intended methods. Then you choose a time. This website doesn't see your card number. <a href="${h("book.html")}">Book and pay</a>.</p></details>
         <details><summary>When can I book?</summary><p>The week of Sunday 29 November 2026, then ongoing. Sunday to Thursday, 11:00 to 20:00 Israel time. Lunch is 12:00 to 12:30. Mondays are also blocked 16:30 to 18:30. Friday and Saturday are closed. <a href="${h("how-it-works.html")}">See the hours</a>.</p></details>
         <details><summary>What if I need to cancel?</summary><p data-cancellation-note>The written cancellation rules are not final yet. The working plan is a free reschedule up to 24 hours before the session. Ask me for the rule in writing before you pay if you need it. The final text will be on the <a href="${h("terms.html")}">Terms page</a> before bookings open.</p></details>
         <details><summary>Will I get a receipt?</summary><p>The payment provider emails a confirmation. A formal Israeli receipt or tax invoice is sent once the invoicing tool is connected to that provider. Keep the confirmation either way.</p></details>
         <details><summary>How is my data used?</summary><p>To reply to you, prepare your session, take payment, and book the time. Marketing messages are sent only if you tick the optional box. Details are in the <a href="${h("privacy.html")}">Privacy Policy</a>.</p></details>
         <details><summary>Is the site accessible?</summary><p>It is built to Israeli Standard 5568, based on WCAG 2.0 Level AA. The <a href="${h("accessibility.html")}">accessibility statement</a> tells you how to ask for help.</p></details>
-        <details><summary>Do you build workflows for companies?</summary><p>Yes. That work is quoted separately and does not use these session prices. <a href="${h("quote.html")}">Get a quote for a custom build</a>.</p></details>
+        <details><summary>Do you build workflows for companies?</summary><p>Yes. That work is quoted separately and doesn't use these session prices. <a href="${h("quote.html")}">Get a quote for a custom build</a>.</p></details>
         <details><summary>What if the 40 sessions sell out?</summary><p>The price card switches to a waitlist for the next release. <a href="${h("waitlist.html")}">Join the waitlist</a>.</p></details>
       </div>
       <p class="actions"><a class="button button-solid" href="${h("assess.html")}">Find your level</a> <a class="button button-line" href="${h("contact.html")}">Ask a question</a></p>
@@ -979,7 +1068,7 @@ pages.push(["privacy.html", {
         <li>Booking details you give the booking tool, and the fact that a payment succeeded. Card numbers stay on the payment provider's page.</li>
         <li>Goals, reviews, and messages you send.</li>
         <li>The consent boxes you ticked, the wording next to them, and the time you sent the form.</li>
-        <li>If you accept analytics, the analytics tool's usage data. If you reject it, that script does not load.</li>
+        <li>If you accept analytics, the analytics tool's usage data. If you reject it, that script doesn't load.</li>
       </ul>
       <h2>Why</h2>
       <p>To answer you, recommend a level, take payment, book a time, prepare the session, and publish a review you agreed to. Marketing email or WhatsApp is sent only if you tick the optional box. That box is separate from the box that lets me contact you about the session or the quote. You can opt out of marketing by writing to me, and I will stop.</p>
@@ -993,7 +1082,7 @@ pages.push(["privacy.html", {
       </ul>
       <p>LetsGo receives a review only if you tick the separate LetsGo box. Until LetsGo offers an automatic import, that handoff is an email or a form, not a live connection from this website.</p>
       <h2>How long it is kept</h2>
-      <p>Working plan, to be confirmed: enquiries from people who do not book are deleted or anonymised after 24 months. Booking and payment records are kept for the period Israeli tax law requires, often 7 years. Reviews stay until you ask for them to be removed. The consent record stays with the submission.</p>
+      <p>Working plan, to be confirmed: enquiries from people who don't book are deleted or anonymised after 24 months. Booking and payment records are kept for the period Israeli tax law requires, often 7 years. Reviews stay until you ask for them to be removed. The consent record stays with the submission.</p>
       <h2>Your requests</h2>
       <p>You can ask to see, correct, or delete your details, subject to records I must keep for tax or for a booking that already happened. Write via the <a href="${h("contact.html")}">contact page</a>. If you are in the EU or UK, say so in the message and I will handle the request with the GDPR rights that apply, including a reply within a month where the law requires it.</p>
       <h2>Cookies and storage</h2>
@@ -1014,10 +1103,10 @@ pages.push(["terms.html", {
       <h1>Terms of service</h1>
       <div class="draft-banner"><p>Draft, dated 20 November 2026. This is not legal advice. Have an Israeli lawyer review it, including the distance-selling rules in the Consumer Protection Law, 1981, before bookings open on 29 November 2026.</p></div>
       <h2>The service</h2>
-      <p>I sell live, one-to-one, online teaching sessions in English, and, separately, custom workflow builds for companies. A session place and a company quote are different offers. Company work is not sold from the 40-session inventory.</p>
+      <p>I sell live, one-to-one, online teaching sessions in English, small-group cohorts, and, separately, custom workflow builds for companies. A one-to-one place, a cohort seat, and a company quote are different offers. Company work isn't sold from the 40-session inventory.</p>
       <h2>Price</h2>
       <p data-vat-note>Prices are in Israeli shekels (ILS). The figure on the payment page is the figure you pay.</p>
-      <p>Session prices step up as places sell: 10 sessions at 400 ILS, then 10 at 600 ILS, then 10 at 800 ILS, then 10 at 1,200 ILS. You pay the step that is open at the time the payment succeeds. Your level does not change the price.</p>
+      <p>One-to-one prices step up as places sell: 10 sessions at 400 ILS, then 10 at 600 ILS, then 10 at 800 ILS, then 10 at 1,200 ILS. You pay the step that's open when the payment succeeds. Your level doesn't change that price. A cohort seat is 600 ILS per person, with a maximum of 15 people, and it doesn't use those 40 places.</p>
       <h2>How a booking is confirmed</h2>
       <p>You pay first. A time is confirmed when the booking tool accepts it after payment. Unpaid holds are not a confirmed session. The seller is Jordana Young. A business registration number and address will be added here once the business is registered.</p>
       <h2>Cancellation and refunds</h2>
@@ -1052,7 +1141,7 @@ pages.push(["accessibility.html", {
         <li>The site is in English, and the language is marked in the page.</li>
       </ul>
       <h2>Limits I know about</h2>
-      <p>Payment, booking, and the form host run on other companies' websites once they are connected. I pick providers that aim to be accessible, and I do not control their pages. If one of those pages blocks you, contact me and I will take the booking or the form another way.</p>
+      <p>Payment, booking, and the form host run on other companies' websites once they are connected. I pick providers that aim to be accessible, and I don't control their pages. If one of those pages blocks you, contact me and I'll take the booking or the form another way.</p>
       <h2>Contact</h2>
       <p>Accessibility contact: Jordana Young. Use the <a href="${h("contact.html")}">contact page</a> and write Accessibility in the message. <a data-email-link data-keep-label hidden href="">Email me</a></p>
       <p>Tell me the page, what you were trying to do, and what happened. I will reply with a practical next step. You can also ask for the information in another format.</p>

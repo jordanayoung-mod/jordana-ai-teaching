@@ -125,8 +125,8 @@
         return;
       }
       var key = form.getAttribute("data-endpoint");
-      var url = cfg.endpoints && cfg.endpoints[key];
-      var ready = helpers.endpointReady ? helpers.endpointReady(key) : !!url;
+      var url = helpers.endpointUrl ? helpers.endpointUrl(key) : ((key === "cohortWaitlist" ? cfg.cohortWaitlistEndpoint : (cfg.endpoints && cfg.endpoints[key])) || "");
+      var ready = helpers.endpointReady ? helpers.endpointReady(key) : !!(url && !/placeholder|example\.com|your-form/i.test(url));
       if (!ready) {
         showAlert(form, form.getAttribute("data-unconfigured") || "This form is not connected yet. Please use the contact page and I will take it from there.", true);
         return;

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-root=".">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Group cohorts · Jordana Young</title>
+  <meta name="description" content="December 2026 cohorts: Beginner on Sunday or Monday evenings, Intermediate on Wednesday evenings. 600 ILS, 15 seats.">
+  <link rel="canonical" href="https://jordanayoung-mod.github.io/jordana-ai-teaching/cohorts.html">
+  <meta name="theme-color" content="#1e463a">
+  <meta property="og:title" content="Group cohorts · Jordana Young">
+  <meta property="og:description" content="December 2026 cohorts: Beginner on Sunday or Monday evenings, Intermediate on Wednesday evenings. 600 ILS, 15 seats.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jordanayoung-mod.github.io/jordana-ai-teaching/cohorts.html">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true">JY</span><span>Jordana Young</span></a>
+      <a class="header-find" href="assess.html">Find your level</a>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="nav-panel">Menu</button>
+      <nav class="nav-panel" id="nav-panel" aria-label="Primary">
+        <ul class="nav-list"><li><a href="sessions.html">Sessions</a></li><li><a href="cohorts.html" aria-current="page">Cohorts</a></li><li><a href="how-it-works.html">How it works</a></li><li><a href="about.html">About</a></li><li><a href="companies.html">For companies</a></li><li><a href="faq.html">FAQ</a></li></ul>
+        <div class="nav-ctas">
+          <a class="button button-line" href="quote.html">Get a quote for a custom build</a>
+          <a class="button button-solid" href="assess.html">Find your level</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <noscript>
+    <div class="wrap" style="padding-top:1rem">
+      <p class="note" style="padding:0.8rem 1rem">JavaScript is off, so the live price and the questionnaire will not run. You can still read every page. Use the contact page and I will tell you the current price.</p>
+    </div>
+  </noscript>
+  <main id="main">
+
+  <section class="section">
+    <div class="wrap">
+      <p class="kicker">Cohorts</p>
+      <h1>Pick a night, then learn with a small group.</h1>
+      <p class="lede">From December 2026 there are three Beginner groups and one Intermediate group. Beginner meets on the same evening for three weeks: Sunday, or one of two Monday times. The first two sessions are 90 minutes. The length of the third isn't set yet. Intermediate meets on Wednesday evenings for four weeks, 90 minutes each time. Every group has 15 seats at 600 ILS. There's a group chat between sessions. This price isn't the one-to-one ladder.</p>
+      <p>Course names and the session topics below are placeholders. I'm still writing the curriculum, and I'll replace them before a group opens. Exact December dates and start times aren't set yet.</p>
+      <div class="cohort-grid" data-cohort-list aria-busy="true"></div>
+      <noscript><p>JavaScript is off, so the seat count can't load. Use the form below, or the contact page, and tell me your level.</p></noscript>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0" aria-labelledby="cohort-waitlist">
+    <div class="wrap-narrow">
+      <h2 id="cohort-waitlist">Join the waitlist</h2>
+      <p>Use this if a cohort is full, or if the next date isn't set yet. I'll email you about that cohort. Other notes only go out if you tick the optional box.</p>
+      <p id="cohort-prefill" class="hint" hidden></p>
+      <form id="cohort-waitlist-form" class="form-card" data-endpoint="cohortWaitlist" data-success="You're on the waitlist. I'll email you when a date is set or a seat opens for this level. I'll only send other notes if you ticked the optional box." data-unconfigured="The cohort waitlist isn't connected yet. Please use the contact page, name the level, and I'll add you by hand." novalidate>
+        <div class="form-alert" data-alert tabindex="-1" hidden></div>
+        <div class="hp"><label for="cohort-hp">Leave this field empty</label><input id="cohort-hp" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
+        <div class="field"><label for="cohort-name">Name (required)</label><input id="cohort-name" name="name" autocomplete="name" required><span class="field-error" data-error-for="name"></span></div>
+        <div class="field"><label for="cohort-email">Email (required)</label><input id="cohort-email" name="email" type="email" autocomplete="email" inputmode="email" required><span class="field-error" data-error-for="email"></span></div>
+        <div class="field"><label for="cohort-phone">Phone (optional)</label><input id="cohort-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"><span class="hint">Include the country code if you add a number, for example +972.</span></div>
+        <div class="field"><label for="cohort-level">Level (required)</label>
+          <select id="cohort-level" name="level" required>
+            <option value="">Choose one</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced (opens later)</option>
+            <option value="expert">Expert (opens later)</option>
+          </select>
+          <span class="field-error" data-error-for="level"></span>
+        </div>
+        <div class="field"><label for="cohort-run">Group</label>
+          <select id="cohort-run" name="runId">
+            <option value="">I'm flexible</option>
+            <option value="beginner-sunday">Beginner, Sunday cohort</option>
+            <option value="beginner-monday-a">Beginner, Monday cohort A</option>
+            <option value="beginner-monday-b">Beginner, Monday cohort B</option>
+            <option value="intermediate-wednesday">Intermediate, Wednesday cohort</option>
+          </select>
+          <span class="hint">Monday cohort A and Monday cohort B are two different time slots. The clocks aren't set yet.</span>
+        </div>
+        <div class="field"><label for="cohort-path">Preferred path</label>
+          <select id="cohort-path" name="path">
+            <option value="">Not sure yet</option>
+            <option value="work">Work productivity</option>
+            <option value="writing">Writing</option>
+            <option value="research">Research</option>
+            <option value="images">Images</option>
+            <option value="agents">Agents and automation</option>
+            <option value="home">AI at home</option>
+          </select>
+        </div>
+        <div class="choice">
+          <input id="cohort-privacy" name="privacyConsent" type="checkbox" value="yes" required>
+          <label for="cohort-privacy">I have read the <a href="privacy.html">Privacy Policy</a> and I agree to be contacted about this cohort. (required)</label>
+        </div>
+        <span class="field-error" data-error-for="privacyConsent"></span>
+        <div class="choice">
+          <input id="cohort-marketing" name="marketingConsent" type="checkbox" value="yes">
+          <label for="cohort-marketing">You may send me occasional tips and offers by email or WhatsApp. This is optional, and I can opt out at any time.</label>
+        </div>
+        <button class="button button-solid" type="submit">Join the waitlist</button>
+      </form>
+    </div>
+  </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="serif" style="font-size:1.6rem;margin:0 0 0.4rem">Jordana Young</p>
+        <p>One-to-one AI sessions, online, in English.</p>
+        <p><a data-email-link data-keep-label hidden href="">Email me</a></p>
+        <p data-email-missing>The public email address will appear here once it is added.</p>
+        <p><a data-whatsapp-link hidden href="" target="_blank" rel="noopener noreferrer">WhatsApp<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+      </div>
+      <div>
+        <p><strong>On this site</strong></p>
+        <ul class="footer-links">
+          <li><a href="sessions.html">Sessions and pricing</a></li>
+          <li><a href="cohorts.html">Group cohorts</a></li>
+          <li><a href="how-it-works.html">How it works</a></li>
+          <li><a href="after-booking.html">After you book</a></li>
+          <li><a href="companies.html">Workflow builds for companies</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p><strong>Policies</strong></p>
+        <ul class="footer-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms</a></li>
+          <li><a href="accessibility.html">Accessibility statement</a></li>
+          <li><a href="review.html">Leave a review</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="wrap disclaimer">
+      <p>This is my personal business website. It is not affiliated with, sponsored or endorsed by Microsoft. Microsoft and Copilot Studio are trademarks of the Microsoft group of companies.</p>
+      <p>© <span data-year>2026</span> Jordana Young</p>
+    </div>
+  </footer>
+  <div id="cookie-banner" class="cookie" hidden role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-text">
+    <p id="cookie-text"><strong id="cookie-title">Analytics cookies.</strong> I use an analytics tool only after you accept. If you reject it, the site still works and no analytics script loads.</p>
+    <button type="button" class="button button-solid" id="cookie-accept">Accept analytics</button>
+    <button type="button" class="button button-line" id="cookie-reject">Reject</button>
+    <a href="privacy.html">Read the Privacy Policy</a>
+  </div>
+  <script src="config.js"></script>
+  <script src="js/logic.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/forms.js"></script>
+  <script src="js/cohorts.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+{
+  "_comment": "Open cohorts from December 2026: one Beginner Sunday group, two Beginner Monday groups, one Intermediate Wednesday group. Advanced and Expert stay in this file with visible false until you turn them on. Each run has its own sessions list, so lengths and nights can differ. startDate null shows 'Starts [month], dates coming soon'. Set startDate to YYYY-MM-DD when the first session is fixed, and set each session date and start (24-hour, Israel time) when you know them. Session 3 of every Beginner run has durationMinutes null until that length is decided. cohortPaymentUrl is the pay link for that run. enrolled is how many people have paid, out of capacity. status is open, full, or waitlist. A run also switches to the waitlist when enrolled reaches capacity.",
+  "priceIls": 600,
+  "levels": [
+    {
+      "id": "beginner",
+      "level": "Beginner",
+      "visible": true,
+      "name": "AI Starter cohort",
+      "promise": "Three live evenings, on the same night across three weeks, with other beginners beside you.",
+      "topics": [
+        "Get comfortable in a chat tool and write a clear prompt",
+        "Use it to draft, summarise, or plan a real task",
+        "Check an answer, and know what is safe to share"
+      ],
+      "outcomes": [
+        "Feel confident using an AI chat tool for everyday tasks.",
+        "Write clear prompts that get useful answers.",
+        "Use AI to draft, summarise and plan.",
+        "Know what's safe to share and how to check an answer."
+      ],
+      "runs": [
+        {
+          "id": "beginner-sunday",
+          "name": "Sunday cohort",
+          "month": "December 2026",
+          "startDate": null,
+          "capacity": 15,
+          "enrolled": 0,
+          "status": "open",
+          "cohortPaymentUrl": "",
+          "sessions": [
+            { "day": "Sunday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Sunday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Sunday", "date": null, "start": null, "durationMinutes": null }
+          ]
+        },
+        {
+          "id": "beginner-monday-a",
+          "name": "Monday cohort A",
+          "month": "December 2026",
+          "startDate": null,
+          "capacity": 15,
+          "enrolled": 0,
+          "status": "open",
+          "cohortPaymentUrl": "",
+          "sessions": [
+            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Monday", "date": null, "start": null, "durationMinutes": null }
+          ]
+        },
+        {
+          "id": "beginner-monday-b",
+          "name": "Monday cohort B",
+          "month": "December 2026",
+          "startDate": null,
+          "capacity": 15,
+          "enrolled": 0,
+          "status": "open",
+          "cohortPaymentUrl": "",
+          "sessions": [
+            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Monday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Monday", "date": null, "start": null, "durationMinutes": null }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intermediate",
+      "level": "Intermediate",
+      "visible": true,
+      "name": "AI at Work cohort",
+      "promise": "Four Wednesday evenings to turn the chat tool you already use into a repeatable work habit.",
+      "topics": [
+        "A reusable prompt framework for a task you repeat",
+        "Work with a file, such as a PDF or a spreadsheet",
+        "Build two or three reliable everyday workflows",
+        "Spot a weak answer and fix it"
+      ],
+      "outcomes": [
+        "Use a reusable prompt framework.",
+        "Work with files such as PDFs and spreadsheets.",
+        "Build 2 to 3 reliable everyday workflows for your own work.",
+        "Spot and fix weak or wrong answers."
+      ],
+      "runs": [
+        {
+          "id": "intermediate-wednesday",
+          "name": "Wednesday cohort",
+          "month": "December 2026",
+          "startDate": null,
+          "capacity": 15,
+          "enrolled": 0,
+          "status": "open",
+          "cohortPaymentUrl": "",
+          "sessions": [
+            { "day": "Wednesday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Wednesday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Wednesday", "date": null, "start": null, "durationMinutes": 90 },
+            { "day": "Wednesday", "date": null, "start": null, "durationMinutes": 90 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "level": "Advanced",
+      "visible": false,
+      "name": "AI Power User cohort",
+      "promise": "Four weekly sessions to start a custom assistant or a simple workflow you will keep.",
+      "topics": [
+        "Pick one process worth improving",
+        "Give the tool a file and a clear job",
+        "Build a custom assistant in your own account",
+        "Set up one simple automation and test it"
+      ],
+      "outcomes": [
+        "Build your own custom assistant (a custom GPT, Claude Project, Gemini Gem, or Copilot agent).",
+        "Combine tools in multi-step workflows.",
+        "Analyse data with AI.",
+        "Set up your first simple automation."
+      ],
+      "runs": []
+    },
+    {
+      "id": "expert",
+      "level": "Expert",
+      "visible": false,
+      "name": "Agents and Automation cohort",
+      "promise": "Four weekly sessions to build the first working piece of an agent or an automation.",
+      "topics": [
+        "Map one repeated process and the check you need",
+        "Connect one tool the agent may use",
+        "Build the smallest version that does the job",
+        "Test it with non-sensitive sample data"
+      ],
+      "outcomes": [
+        "Design and build an AI agent for a real process.",
+        "Connect AI to your other tools with automations.",
+        "Test and improve an agent's reliability.",
+        "Leave with a working build and a plan to scale it."
+      ],
+      "runs": []
+    }
+  ]
+}

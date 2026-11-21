@@ -87,8 +87,13 @@
   }
   applyContact();
 
+  function endpointUrl(key) {
+    if (key === "cohortWaitlist") return cfg.cohortWaitlistEndpoint || "";
+    return (cfg.endpoints && cfg.endpoints[key]) || "";
+  }
+
   function endpointReady(key) {
-    var url = cfg.endpoints && cfg.endpoints[key];
+    var url = endpointUrl(key);
     if (!url) return false;
     if (/placeholder|example\.com|your-form/i.test(url)) return false;
     return true;
@@ -98,7 +103,8 @@
     root: root,
     abs: abs,
     cfg: cfg,
-    endpointReady: endpointReady
+    endpointReady: endpointReady,
+    endpointUrl: endpointUrl
   };
 
   var logic = window.SiteLogic;

@@ -150,4 +150,35 @@ assert.strictEqual(tracked.searchParams.get("a2"), "Writing");
 assert.ok(tracked.searchParams.get("notes").indexOf("Level: Beginner") === 0);
 assert.ok(tracked.searchParams.get("notes").indexOf("Price: 400 ILS") !== -1);
 
+assert.strictEqual(logic.cohortAvailability({ capacity: 15, enrolled: 0, status: "open" }).line, "15 of 15 seats left");
+assert.strictEqual(logic.cohortAvailability({ capacity: 15, enrolled: 0, status: "open" }).waitlist, false);
+assert.strictEqual(logic.cohortAvailability({ capacity: 15, enrolled: 12, status: "open" }).line, "3 of 15 seats left");
+assert.strictEqual(logic.cohortAvailability({ capacity: 15, enrolled: 15, status: "open" }).waitlist, true);
+assert.strictEqual(logic.cohortAvailability({ capacity: 15, enrolled: 0, status: "waitlist" }).waitlist, true);
+assert.strictEqual(logic.cohortAvailability({ capacity: 15, enrolled: 4, status: "full" }).line, "11 of 15 seats left");
+assert.strictEqual(logic.cohortAvailability({ capacity: 15, enrolled: 4, status: "full" }).waitlist, true);
+assert.strictEqual(logic.formatSessionPattern([
+  { day: "Sunday", durationMinutes: 90 },
+  { day: "Sunday", durationMinutes: 90 },
+  { day: "Sunday", durationMinutes: null }
+]), "Sun 90 min, Sun 90 min, Sun (length TBC)");
+assert.strictEqual(logic.formatSessionPattern([
+  { day: "Wednesday", durationMinutes: 90 },
+  { day: "Wednesday", durationMinutes: 90 },
+  { day: "Wednesday", durationMinutes: 90 },
+  { day: "Wednesday", durationMinutes: 90 }
+]), "4 weekly Wednesday evenings, 90 minutes each (6 hours live)");
+assert.strictEqual(logic.formatRunWhen({ month: "December 2026", startDate: null }).indexOf("Starts December 2026, dates coming soon"), 0);
+assert.strictEqual(logic.runHasDate({ startDate: null, sessions: [{ date: null }] }), false);
+assert.strictEqual(logic.runHasDate({ startDate: "2026-12-06" }), true);
+assert.strictEqual(logic.cohortSchedule({ startDate: null }).comingSoon, true);
+assert.strictEqual(logic.cohortSchedule({ startDate: "2027-03-02", time: "18:00 to 19:30" }).line, "Starts Tuesday 2 March 2027, 18:00 to 19:30 Israel time");
+var ordered = logic.cohortsForLevel([
+  { id: "beginner-later", levelId: "beginner", startDate: "2027-06-01" },
+  { id: "expert", levelId: "expert", startDate: "2027-04-01" },
+  { id: "beginner", levelId: "beginner", startDate: null },
+  { id: "beginner-soon", levelId: "beginner", startDate: "2027-03-02" }
+], "beginner");
+assert.deepStrictEqual(ordered.map(function (item) { return item.id; }), ["beginner-soon", "beginner-later", "beginner"]);
+
 console.log("logic tests passed");

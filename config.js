@@ -30,7 +30,7 @@ window.SITE_CONFIG = {
     processors: [
       {
         name: "Form host (not connected yet)",
-        purpose: "Will store form submissions: name, email, phone, questionnaire answers, quote requests, and reviews."
+        purpose: "Will store form submissions: name, email, phone, questionnaire answers, quote requests, reviews, and cohort waitlist requests."
       },
       {
         name: "Israeli payment provider (not connected yet)",
@@ -122,5 +122,11 @@ window.SITE_CONFIG = {
      ({ "sold": number, "tiers": [ { "priceIls", "slots" }, ... ] }).
      If the live URL fails, the site falls back to data/inventory.json.
      See the README for a Google Sheet / Airtable path. */
-  inventoryLiveUrl: ""
+  inventoryLiveUrl: "",
+
+  /* Cohort waitlist form. Same rules as the other endpoints: a real https URL,
+     or leave "" until the form service is connected.
+     Each run's pay link is cohortPaymentUrl on that run in data/cohorts.json,
+     not in this file, because the groups have different links. */
+  cohortWaitlistEndpoint: ""
 };

@@ -690,6 +690,58 @@ textarea { min-height: 8rem; resize: vertical; }
   .nav-ctas .button { min-height: 44px; padding-inline: 0.8rem; white-space: nowrap; }
 }
 
+.cohort-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.cohort-card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.1rem 1.2rem;
+}
+
+.cohort-card .kicker { margin-bottom: 0.2rem; }
+
+.cohort-seats {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.cohort-card .actions { align-items: flex-start; }
+
+.cohort-card .hint { flex-basis: 100%; }
+
+.run-list { display: grid; gap: 0.75rem; margin-top: 0.5rem; }
+
+.run {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.85rem 0.9rem 1rem;
+  background: var(--bg);
+}
+
+.run-name { font-size: 1.15rem; margin-bottom: 0.2rem; }
+
+.run-ask { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+
+.run-ask p { flex-basis: 100%; margin-bottom: 0; }
+
+.quiet-offer {
+  margin-top: 1.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.quiet-offer h2 { font-size: 1.35rem; }
+
+#cohort-offer { margin-top: 1.4rem; }
+
+@media (min-width: 720px) {
+  .cohort-grid { grid-template-columns: 1fr 1fr; }
+}
+
 @media (max-width: 420px) {
   .header-inner { gap: 0.45rem; }
   .logo { font-size: 0.95rem; gap: 0.4rem; }

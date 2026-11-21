@@ -22,7 +22,7 @@
       <a class="header-find" href="assess.html">Find your level</a>
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="nav-panel">Menu</button>
       <nav class="nav-panel" id="nav-panel" aria-label="Primary">
-        <ul class="nav-list"><li><a href="sessions.html">Sessions</a></li><li><a href="how-it-works.html">How it works</a></li><li><a href="about.html">About</a></li><li><a href="companies.html">For companies</a></li><li><a href="faq.html">FAQ</a></li></ul>
+        <ul class="nav-list"><li><a href="sessions.html">Sessions</a></li><li><a href="cohorts.html">Cohorts</a></li><li><a href="how-it-works.html">How it works</a></li><li><a href="about.html">About</a></li><li><a href="companies.html">For companies</a></li><li><a href="faq.html">FAQ</a></li></ul>
         <div class="nav-ctas">
           <a class="button button-line" href="quote.html">Get a quote for a custom build</a>
           <a class="button button-solid" href="assess.html">Find your level</a>
@@ -45,37 +45,27 @@
         <p><a class="button button-solid" href="assess.html">Find your level</a></p>
       </div>
       <div id="result" hidden>
-        <p class="kicker">Your recommendation</p>
-        <h1 id="result-level">Level</h1>
-        <p id="result-score"></p>
+        <p class="kicker">Your result</p>
+        <h1 id="result-level">Your level</h1>
         <p id="result-summary" class="lede"></p>
+        <p id="result-score"></p>
         <p id="result-adjust" hidden></p>
         <h2>Learning path: <span id="result-path"></span></h2>
         <p id="result-path-summary"></p>
-        <p>The price is the same at every level. It is the step that is open right now.</p>
-        <div class="price-layout">
-          <div class="price-card">
-    <p class="kicker">Current price</p>
-    <p class="price-amount" data-price-amount>Loading</p>
-    <p class="visually-hidden" data-price-status role="status">Loading the current price.</p>
-    <p class="price-left" data-price-left>Loading how many are left.</p>
-    <p data-price-next></p>
-    <p class="muted" data-price-sold></p>
-    <div data-when="available"><a class="button button-solid" href="book.html">Book and pay</a></div>
-    <div data-when="soldout" hidden>
-      <p>All 40 sessions in this release are sold.</p>
-      <a class="button button-solid" href="waitlist.html">Join the waitlist</a>
-    </div>
-  </div>
-          <div>
-            <p>Book and pay opens the payment page, then the booking page. Your name, email, and level are added to those links.</p>
-            <p><a id="result-prep" href="prep/beginner.html">Read the prep for this level</a></p>
-            <p><a href="after-booking.html">See what happens after you book</a></p>
-          </div>
-        </div>
+        <h2>By the end of this course you will…</h2>
+        <ul id="result-outcomes" class="check"></ul>
+        <section id="cohort-offer" aria-live="polite">
+          <h2>The next groups</h2>
+          <div id="cohort-offer-body"><p>Loading the groups for your level.</p></div>
+        </section>
+        <aside id="session-cta" class="quiet-offer">
+          <h2>Prefer a one-to-one session?</h2>
+          <p>That's a single live session at the current price. It's separate from the cohort, and your level doesn't change that price.</p>
+          <p class="actions"><a class="button button-line" href="book.html">Book a one-to-one session</a> <a id="result-prep" href="prep/beginner.html">Read the prep for this level</a></p>
+        </aside>
         <aside id="company-cta" class="note" style="padding:1rem;margin-top:1.2rem" hidden>
           <h2>Building this for a team?</h2>
-          <p>A workflow for a company is a separate quote. It does not use this session price.</p>
+          <p>A workflow for a company is a separate quote. It doesn't use this session price, or the cohort price.</p>
           <p><a class="button button-accent" href="quote.html">Get a quote for a custom build</a></p>
         </aside>
       </div>
@@ -95,6 +85,7 @@
         <p><strong>On this site</strong></p>
         <ul class="footer-links">
           <li><a href="sessions.html">Sessions and pricing</a></li>
+          <li><a href="cohorts.html">Group cohorts</a></li>
           <li><a href="how-it-works.html">How it works</a></li>
           <li><a href="after-booking.html">After you book</a></li>
           <li><a href="companies.html">Workflow builds for companies</a></li>

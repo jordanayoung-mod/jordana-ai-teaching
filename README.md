@@ -158,6 +158,30 @@ If question 1 is "I haven't tried it yet.", the level stays Beginner. If questio
 
 You can check the scoring on your own computer with `node tests/logic.test.js`.
 
+## Cohorts
+
+Open groups from December 2026 live in `data/cohorts.json`:
+
+- Beginner, Sunday evenings: one group. Three sessions on Sundays. Sessions 1 and 2 are 90 minutes. Session 3 has `durationMinutes: null` until you decide the length, and the site shows "length TBC" with no total hours.
+- Beginner, Monday evenings: two groups, Monday cohort A and Monday cohort B. Same three-session shape. Set each session's `start` when the two time slots are different, for example `"18:00"` and `"20:00"`.
+- Intermediate, Wednesday evenings: one group. Four weekly sessions, 90 minutes each.
+- Advanced and Expert are in the file with `"visible": false`. They stay off the Cohorts page and the home teaser. On the questionnaire result, those levels see a note that the cohort opens soon, a waitlist link, the one-to-one option, and the custom-build quote. Set `visible` to `true` when you want the cards public, and add a `runs` list first.
+
+Each person pays 600 ILS. Each run holds 15 people. A run with `startDate` null shows "Starts December 2026, dates coming soon" and offers the waitlist. A sign-up button appears only after that run has a date and seats left.
+
+To open dates for a run:
+
+1. Set `startDate` to the first session, as `YYYY-MM-DD`.
+2. Set each session's `date` the same way, and `start` to the Israel time, such as `"18:00"`.
+3. Paste the payment page into that run's `cohortPaymentUrl`.
+4. Push to `main`.
+
+To record a paid seat, add 1 to that run's `enrolled`. At 15, or if you set `status` to `full` or `waitlist`, the button becomes "Join the waitlist". Lower `enrolled` if someone drops out.
+
+The waitlist form posts to `cohortWaitlistEndpoint` in `config.js`. Leave it empty until the form service is connected.
+
+Course names and session topics are placeholders. Replace them in the same file when the curriculum is ready.
+
 ## Change a sentence on a page
 
 Edit the HTML file (for example `faq.html`) and push to `main`.
@@ -194,6 +218,12 @@ The site is usable before these are done. Buttons that need a missing link say t
 24. A portrait at `business.photo`, if you want one
 25. Analytics, only if you want it (`analytics.enabled` and `analytics.src`)
 26. The first real value of `sold` stays 0 until someone pays
+27. `cohortWaitlistEndpoint` in `config.js`
+28. Each open run's `cohortPaymentUrl` in `data/cohorts.json`
+29. December dates and start times on those runs (`startDate`, and each session `date` and `start`)
+30. Beginner session 3 length (`durationMinutes` is null until you decide it)
+31. `enrolled` on each run, after someone pays
+32. Advanced and Expert: add runs and set `visible` to `true` when those cohorts should appear
 
 ## How publishing works
 

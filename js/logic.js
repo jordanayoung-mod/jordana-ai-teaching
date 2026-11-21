@@ -151,6 +151,122 @@
     };
   }
 
+  var DAY_SHORT = {
+    Sunday: "Sun",
+    Monday: "Mon",
+    Tuesday: "Tue",
+    Wednesday: "Wed",
+    Thursday: "Thu",
+    Friday: "Fri",
+    Saturday: "Sat"
+  };
+
+  function formatSessionPattern(sessions) {
+    var list = sessions || [];
+    if (!list.length) return "";
+    var known = list.every(function (session) { return typeof session.durationMinutes === "number"; });
+    var sameDay = list.every(function (session) { return session.day && session.day === list[0].day; });
+    var sameLength = known && list.every(function (session) {
+      return session.durationMinutes === list[0].durationMinutes;
+    });
+    if (list.length >= 4 && sameDay && sameLength) {
+      var hours = (list[0].durationMinutes * list.length) / 60;
+      var hoursLabel = hours === 1 ? "1 hour" : hours + " hours";
+      return list.length + " weekly " + list[0].day + " evenings, " + list[0].durationMinutes + " minutes each (" + hoursLabel + " live)";
+    }
+    return list.map(function (session) {
+      var day = DAY_SHORT[session.day] || session.day || "Session";
+      if (session.durationMinutes == null) return day + " (length TBC)";
+      return day + " " + session.durationMinutes + " min";
+    }).join(", ");
+  }
+
+  function runHasDate(run) {
+    if (!run) return false;
+    if (run.startDate) return true;
+    return (run.sessions || []).some(function (session) { return !!session.date; });
+  }
+
+  function formatRunWhen(run) {
+    var item = run || {};
+    if (!runHasDate(item)) {
+      return "Starts " + (item.month || "soon") + ", dates coming soon";
+    }
+    var schedule = cohortSchedule({
+      startDate: item.startDate,
+      weekday: item.weekday,
+      time: item.time || ((item.sessions || [])[0] && (item.sessions || [])[0].start) || ""
+    });
+    return schedule.line;
+  }
+
+  function sortRuns(runs) {
+    return (runs || []).slice().sort(function (a, b) {
+      if (!a.startDate && !b.startDate) return 0;
+      if (!a.startDate) return 1;
+      if (!b.startDate) return -1;
+      if (a.startDate < b.startDate) return -1;
+      if (a.startDate > b.startDate) return 1;
+      return 0;
+    });
+  }
+
+  function cohortSchedule(cohort) {
+    var item = cohort || {};
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    if (!item.startDate) {
+      return { comingSoon: true, line: "The next date is coming soon." };
+    }
+    var parts = String(item.startDate).split("-");
+    var year = Number(parts[0]);
+    var month = Number(parts[1]);
+    var day = Number(parts[2]);
+    if (!year || month < 1 || month > 12 || !day) {
+      return { comingSoon: true, line: "The next date is coming soon." };
+    }
+    var weekday = item.weekday;
+    if (!weekday && typeof Intl !== "undefined") {
+      var utc = new Date(Date.UTC(year, month - 1, day, 10, 0, 0));
+      weekday = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "Asia/Jerusalem" }).format(utc);
+    }
+    var dateLabel = day + " " + months[month - 1] + " " + year;
+    var when = "Starts " + (weekday ? weekday + " " : "") + dateLabel;
+    if (item.time) when += ", " + item.time + " Israel time";
+    else when += ", Israel time";
+    return { comingSoon: false, line: when };
+  }
+
+  function cohortsForLevel(cohorts, levelId) {
+    return (cohorts || []).filter(function (item) {
+      return item && (item.levelId === levelId || item.id === levelId);
+    }).slice().sort(function (a, b) {
+      if (!a.startDate && !b.startDate) return 0;
+      if (!a.startDate) return 1;
+      if (!b.startDate) return -1;
+      if (a.startDate < b.startDate) return -1;
+      if (a.startDate > b.startDate) return 1;
+      return 0;
+    });
+  }
+
+  function cohortAvailability(cohort) {
+    var item = cohort || {};
+    var capacity = Number(item.capacity);
+    if (!isFinite(capacity) || capacity < 0) capacity = 15;
+    var enrolled = Number(item.enrolled);
+    if (!isFinite(enrolled) || enrolled < 0) enrolled = 0;
+    var left = Math.max(0, capacity - enrolled);
+    var status = String(item.status || "open");
+    var waitlist = status === "waitlist" || status === "full" || enrolled >= capacity;
+    return {
+      left: left,
+      capacity: capacity,
+      enrolled: enrolled,
+      waitlist: waitlist,
+      line: left + " of " + capacity + " seats left"
+    };
+  }
+
   function buildTrackedUrl(base, queryMap, includeNotes, values) {
     var url = new URL(base);
     var query = queryMap || {};
@@ -179,6 +295,13 @@
     nextLine: nextLine,
     pointsForQuestion: pointsForQuestion,
     scoreAssessment: scoreAssessment,
+    formatSessionPattern: formatSessionPattern,
+    runHasDate: runHasDate,
+    formatRunWhen: formatRunWhen,
+    sortRuns: sortRuns,
+    cohortSchedule: cohortSchedule,
+    cohortsForLevel: cohortsForLevel,
+    cohortAvailability: cohortAvailability,
     buildTrackedUrl: buildTrackedUrl
   };
 });

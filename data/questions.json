@@ -7,28 +7,28 @@
       "label": "Beginner",
       "min": 0,
       "max": 7,
-      "summary": "You are at the start, so the session stays practical and unhurried. We get an account working, try a few prompts on a real everyday task, and practise telling a useful answer from a shaky one. You should leave with one or two prompts you can reuse this week."
+      "summary": "You're new to this, or you've barely tried it. We'll start with an account, a real everyday task, and a prompt you can use again this week."
     },
     {
       "id": "intermediate",
       "label": "Intermediate",
       "min": 8,
       "max": 15,
-      "summary": "You already use a chat tool, so we spend the time on clearer prompts and a repeatable way to do a real task. Bring work you are allowed to share. You should leave with a template you can run again without me."
+      "summary": "You already use a chat tool. We'll turn that into clearer prompts and a workflow you can run on your own work."
     },
     {
       "id": "advanced",
       "label": "Advanced",
       "min": 16,
       "max": 23,
-      "summary": "You use AI often, so we build something that can stay in your workflow: a custom assistant, a task that uses a file, or a simple automation. Come with one process you want to improve. You should leave with that workflow started in your own account."
+      "summary": "You use AI often. We'll build something that stays in your workflow, such as a custom assistant or a simple automation."
     },
     {
       "id": "expert",
       "label": "Expert",
       "min": 24,
       "max": 30,
-      "summary": "You are ready to connect tools and build an agent or a multi-step automation. We scope one workflow and build as far as the session allows. You should leave with a working piece of that system, plus the next steps to finish it."
+      "summary": "You're ready to connect tools. We'll scope one agent or automation and build the first working piece."
     }
   ],
   "adjustments": {
