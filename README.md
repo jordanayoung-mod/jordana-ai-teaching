@@ -154,7 +154,7 @@ Edit `data/questions.json`. Each scored answer is worth 0 to 3. The maximum is 3
 | 16 to 23 | Advanced |
 | 24 to 30 | Expert |
 
-If question 1 is "Never", the level stays Beginner. If the path is agents and the score is 12 or more, the level moves up one band, unless the Beginner cap already applied. Push to `main` after you edit the file.
+If question 1 is "I haven't tried it yet.", the level stays Beginner. If question 12 is "Agents and automation" and the score is 12 or more, the level moves up one band, unless the Beginner cap already applied. Question 2 is a single choice, scored 0 to 3 in the order the answers are listed. Push to `main` after you edit the file.
 
 You can check the scoring on your own computer with `node tests/logic.test.js`.
 

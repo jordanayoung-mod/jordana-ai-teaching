@@ -25,7 +25,7 @@ assert.strictEqual(logic.formatIls(1200), "1,200 ILS");
 function answers(overrides) {
   var base = {
     q1: "never",
-    q2: ["none"],
+    q2: "none",
     q3: "nothing",
     q4: "unsure",
     q5: "no",
@@ -47,7 +47,7 @@ assert.strictEqual(beginner.path.label, "Work productivity");
 
 var top = logic.scoreAssessment(questions, answers({
   q1: "daily",
-  q2: ["chat", "image", "meeting", "automation"],
+  q2: "lots",
   q3: "workflows",
   q4: "templates",
   q5: "regularly",
@@ -64,7 +64,7 @@ assert.strictEqual(top.bumped, false);
 
 var edge = logic.scoreAssessment(questions, answers({
   q1: "weekly",
-  q2: ["chat"],
+  q2: "one",
   q3: "writing",
   q4: "context",
   q5: "once",
@@ -80,7 +80,7 @@ assert.strictEqual(edge.level.id, "intermediate");
 
 var cap = logic.scoreAssessment(questions, answers({
   q1: "never",
-  q2: ["chat", "image", "meeting", "automation"],
+  q2: "lots",
   q3: "workflows",
   q4: "templates",
   q5: "regularly",
@@ -98,7 +98,7 @@ assert.strictEqual(cap.bumped, false);
 
 var bump = logic.scoreAssessment(questions, answers({
   q1: "weekly",
-  q2: ["chat"],
+  q2: "one",
   q3: "writing",
   q4: "context",
   q5: "once",
@@ -115,7 +115,7 @@ assert.strictEqual(bump.level.id, "advanced");
 
 var noBump = logic.scoreAssessment(questions, answers({
   q1: "once",
-  q2: ["chat"],
+  q2: "one",
   q3: "search",
   q4: "question",
   q5: "once",
