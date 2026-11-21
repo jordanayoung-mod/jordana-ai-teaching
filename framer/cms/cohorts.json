@@ -1,0 +1,67 @@
+[
+  {
+    "Title": "AI Starter, Sunday Group A",
+    "Slug": "ai-starter-sunday-a",
+    "Level": "Beginner",
+    "Day": "Sunday",
+    "Schedule Details": "3 weekly Sunday evening sessions on Zoom, Israel time: Session 1 (90 min), Session 2 (90 min), Session 3 (60 min live clinic and wrap-up). Starts December 2026, exact dates coming soon.",
+    "Price": 600,
+    "Seats Remaining": 15,
+    "Status": "Waitlist",
+    "Visible": true,
+    "Promise": "Go from \"where do I even start?\" to using AI with confidence for real tasks every week.",
+    "Payment Link": ""
+  },
+  {
+    "Title": "AI Starter, Sunday Group B",
+    "Slug": "ai-starter-sunday-b",
+    "Level": "Beginner",
+    "Day": "Sunday",
+    "Schedule Details": "3 weekly Sunday evening sessions on Zoom, Israel time: Session 1 (90 min), Session 2 (90 min), Session 3 (60 min live clinic and wrap-up). Starts December 2026, exact dates coming soon.",
+    "Price": 600,
+    "Seats Remaining": 15,
+    "Status": "Waitlist",
+    "Visible": true,
+    "Promise": "Go from \"where do I even start?\" to using AI with confidence for real tasks every week.",
+    "Payment Link": ""
+  },
+  {
+    "Title": "AI at Work, Wednesday Group",
+    "Slug": "ai-at-work-wednesday",
+    "Level": "Intermediate",
+    "Day": "Wednesday",
+    "Schedule Details": "4 weekly Wednesday evening sessions on Zoom, 90 min each, Israel time. Starts December 2026, exact dates coming soon.",
+    "Price": 600,
+    "Seats Remaining": 15,
+    "Status": "Waitlist",
+    "Visible": true,
+    "Promise": "Turn hit-and-miss prompting into a personal prompt library and one reliable weekly workflow.",
+    "Payment Link": ""
+  },
+  {
+    "Title": "AI Power User",
+    "Slug": "ai-power-user",
+    "Level": "Advanced",
+    "Day": "To be scheduled",
+    "Schedule Details": "4 weekly sessions of 90 min on Zoom, Israel time. Curriculum drafted, opening Q1 2027.",
+    "Price": 600,
+    "Seats Remaining": 15,
+    "Status": "Waitlist",
+    "Visible": false,
+    "Promise": "Work with files and data and build your own custom AI assistant that saves you real hours.",
+    "Payment Link": ""
+  },
+  {
+    "Title": "Agents and Automation",
+    "Slug": "agents-and-automation",
+    "Level": "Expert",
+    "Day": "To be scheduled",
+    "Schedule Details": "4 weekly sessions of 90 min on Zoom, Israel time. Curriculum drafted, opening Q1 2027.",
+    "Price": 600,
+    "Seats Remaining": 15,
+    "Status": "Waitlist",
+    "Visible": false,
+    "Promise": "Design, build and safely pilot an AI automation or agent on a real process.",
+    "Payment Link": ""
+  }
+]

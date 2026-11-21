@@ -1,0 +1,56 @@
+[
+  {
+    "Title": "The three-part ask: turn a vague request into a useful answer",
+    "Slug": "three-part-ask",
+    "Level": "Beginner",
+    "Use Case": "Work Productivity",
+    "Summary": "Most weak AI answers come from weak asks. Give AI the task, the context and the format you want, then improve the answer with one follow-up instead of starting again.",
+    "Prompt Template": "Task: [what you need, in one sentence]\nContext: [who it's for, what they already know, anything AI must not change]\nFormat: [for example: 5 bullet points, under 120 words, friendly tone]\n\nBefore you answer, ask me up to 3 questions if anything important is missing.",
+    "Read Time": 3
+  },
+  {
+    "Title": "Make AI write like you with a one-page style guide",
+    "Slug": "style-guide-writing",
+    "Level": "Intermediate",
+    "Use Case": "Writing",
+    "Summary": "Paste three things you've written and let AI build a style guide from them. Reuse that guide at the top of every writing prompt so drafts sound like you and need fewer edits.",
+    "Prompt Template": "Here are 3 samples of my writing:\n[sample 1]\n[sample 2]\n[sample 3]\n\nWrite a one-page style guide for my voice: sentence length, tone, words I use often, words I never use, how I open and close messages. Then rewrite this draft in my style: [draft].",
+    "Read Time": 4
+  },
+  {
+    "Title": "Research you can trust: answers with sources and a quick check",
+    "Slug": "research-with-sources",
+    "Level": "Intermediate",
+    "Use Case": "Research",
+    "Summary": "Ask for sources on every claim, then check the one fact your decision depends on. A simple routine that stops you acting on a confident but wrong answer.",
+    "Prompt Template": "Question: [your research question]\nGive me a short answer (under 150 words), then a table with each key claim, the source link, and how confident you are (high, medium, low).\nFlag anything that depends on dates, prices or laws that may have changed.\n\nThen tell me the single fact I should double-check myself before acting.",
+    "Read Time": 4
+  },
+  {
+    "Title": "Describe an image like a designer would",
+    "Slug": "describe-images",
+    "Level": "Beginner",
+    "Use Case": "Images",
+    "Summary": "Good images come from five details: subject, setting, style, light and layout. Fill them in and ask for 3 variations, then pick one and refine it with small changes.",
+    "Prompt Template": "Create an image of [subject] in [setting].\nStyle: [for example: clean flat illustration, warm editorial photo]\nLight and colours: [for example: soft morning light, navy and cream with an amber accent]\nLayout: [for example: wide 16:9, empty space on the left for a headline]\nAvoid: [text in the image, logos, extra people]\nGive me 3 variations.",
+    "Read Time": 3
+  },
+  {
+    "Title": "Plan your first automation in 15 minutes",
+    "Slug": "plan-first-automation",
+    "Level": "Advanced",
+    "Use Case": "Agents & Automation",
+    "Summary": "Before you open Zapier, Make, n8n or Power Automate, write the recipe: what starts it, what goes in, each step, where a human checks, and what happens if it fails. AI can help you write it.",
+    "Prompt Template": "I want to automate this task: [describe what happens today, step by step].\nIt happens [how often] and takes about [minutes].\n\nWrite a simple design spec with: trigger, inputs, numbered steps, which tool does each step, where a person must approve before anything is sent or deleted, and what should happen if a step fails.\nThen suggest the smallest first version I could build this week.",
+    "Read Time": 5
+  },
+  {
+    "Title": "Weekly family planner in five minutes",
+    "Slug": "weekly-family-planner",
+    "Level": "Beginner",
+    "Use Case": "AI at Home",
+    "Summary": "Tell AI what your week looks like and get a meal plan, a shopping list grouped by aisle and a short reminders list. Keep the prompt and reuse it every Sunday.",
+    "Prompt Template": "Here's our week: [who's home which evenings, activities, anything special].\nWe like: [foods] and avoid: [allergies or dislikes]. Budget: [amount in ILS].\n\nMake: 1) a simple dinner plan for Sunday to Thursday, 2) one shopping list grouped by supermarket section, 3) a short reminders list for the week. Keep each dinner under 40 minutes.",
+    "Read Time": 3
+  }
+]

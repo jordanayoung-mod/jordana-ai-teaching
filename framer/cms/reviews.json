@@ -1,0 +1,10 @@
+{
+  "fields": [
+    "Student Name",
+    "Role",
+    "Quote",
+    "Approved"
+  ],
+  "items": [],
+  "note": "Empty on purpose. Add real reviews only, and set Approved to Yes to show them on the site."
+}
